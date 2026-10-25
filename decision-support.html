@@ -1,0 +1,1167 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#FFF5F7">
+  <title>Financial Decision Support | FinPath</title>
+  <link rel="stylesheet" href="style.css">
+
+  <style>
+    :root {
+      --pink: #D91F5D;
+      --crimson: #A51246;
+      --ink: #421629;
+      --muted: #795C69;
+      --border: #F0DDE4;
+      --pale: #FFF5F7;
+      --green: #16834A;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      background: #FFFAFC;
+      color: var(--ink);
+    }
+
+    .decision-page {
+      max-width: 1120px;
+      margin: auto;
+      padding: 25px 20px 55px;
+    }
+
+    .decision-nav {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      flex-wrap: wrap;
+      margin-bottom: 35px;
+    }
+
+    .decision-hero {
+      background: linear-gradient(130deg, #FFF0F5, #FFFFFF 70%);
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      padding: clamp(24px, 5vw, 46px);
+      margin-bottom: 24px;
+    }
+
+    .decision-hero h1 {
+      font-size: clamp(28px, 5vw, 43px);
+      line-height: 1.15;
+      margin: 14px 0;
+      max-width: 720px;
+    }
+
+    .decision-hero p {
+      color: var(--muted);
+      line-height: 1.8;
+      max-width: 700px;
+      font-size: 14px;
+    }
+
+    .decision-eyebrow {
+      display: inline-block;
+      font-size: 11px;
+      letter-spacing: 1.5px;
+      font-weight: 800;
+      color: var(--crimson);
+    }
+
+    .decision-panel {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 17px;
+      padding: 25px;
+      margin-top: 22px;
+      min-width: 0;
+      box-shadow: 0 6px 22px rgba(100, 20, 50, 0.035);
+    }
+
+    .decision-panel h2 {
+      font-size: 20px;
+      margin: 0 0 8px;
+    }
+
+    .decision-muted {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.8;
+    }
+
+    .decision-form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+      margin-top: 22px;
+    }
+
+    .decision-field {
+      min-width: 0;
+    }
+
+    .decision-field.full {
+      grid-column: 1 / -1;
+    }
+
+    .decision-field label {
+      display: block;
+      font-size: 12px;
+      font-weight: 750;
+      margin-bottom: 8px;
+    }
+
+    .decision-field input,
+    .decision-field select {
+      width: 100%;
+      padding: 13px;
+      border: 1px solid var(--border);
+      background: #FFFAFC;
+      border-radius: 10px;
+      color: var(--ink);
+      font: inherit;
+      font-size: 14px;
+    }
+
+    .decision-field input:focus,
+    .decision-field select:focus {
+      outline: 2px solid #F4B4CA;
+      border-color: var(--pink);
+    }
+
+    .decision-check {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 15px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: #FFFAFC;
+      line-height: 1.7;
+      font-size: 13px;
+    }
+
+    .decision-check input {
+      margin-top: 4px;
+      accent-color: var(--pink);
+      width: 17px;
+      height: 17px;
+      flex-shrink: 0;
+    }
+
+    .decision-button {
+      border: none;
+      background: var(--pink);
+      color: white;
+      padding: 14px 20px;
+      font-weight: 800;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .decision-button:hover { background: var(--crimson); }
+
+    .decision-button.secondary {
+      background: white;
+      color: var(--crimson);
+      border: 1px solid var(--border);
+    }
+
+    .decision-button.secondary:hover { background: var(--pale); }
+
+    .decision-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 23px;
+    }
+
+    .decision-results {
+      display: none;
+      margin-top: 25px;
+    }
+
+    .decision-results.visible { display: block; }
+
+    .decision-summary {
+      background: linear-gradient(135deg, #FCE8EF, #FFF7FA);
+      border: 1px solid #F2CDDA;
+      border-radius: 16px;
+      padding: 22px;
+      margin-bottom: 18px;
+    }
+
+    .decision-summary h2 { margin: 8px 0; }
+
+    .decision-summary p {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.8;
+    }
+
+    .decision-stats {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 18px;
+    }
+
+    .decision-stat {
+      padding: 15px;
+      border: 1px solid var(--border);
+      background: white;
+      border-radius: 12px;
+      min-width: 0;
+    }
+
+    .decision-stat span {
+      display: block;
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.6;
+    }
+
+    .decision-stat strong {
+      display: block;
+      margin-top: 7px;
+      color: var(--crimson);
+      font-size: clamp(16px, 2.5vw, 23px);
+      overflow-wrap: anywhere;
+    }
+
+    .decision-option-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 15px;
+      margin-top: 18px;
+    }
+
+    .decision-option {
+      border: 1px solid var(--border);
+      background: white;
+      border-radius: 14px;
+      padding: 19px;
+      min-width: 0;
+    }
+
+    .decision-option.best {
+      border: 2px solid #D96A91;
+      background: #FFFAFC;
+    }
+
+    .decision-option h3 {
+      margin: 12px 0 8px;
+      font-size: 17px;
+    }
+
+    .decision-option p {
+      font-size: 12px;
+      line-height: 1.8;
+      color: var(--muted);
+    }
+
+    .decision-tag {
+      display: inline-block;
+      padding: 6px 9px;
+      border-radius: 7px;
+      font-size: 10px;
+      font-weight: 800;
+      background: #FCE8EF;
+      color: var(--crimson);
+    }
+
+    .decision-tag.neutral {
+      background: #F3F0F2;
+      color: #65525A;
+    }
+
+    .decision-tag.green {
+      background: #E8F7EE;
+      color: #166534;
+    }
+
+    .decision-meter {
+      height: 7px;
+      background: #F4E5EB;
+      border-radius: 10px;
+      overflow: hidden;
+      margin: 12px 0 7px;
+    }
+
+    .decision-meter span {
+      display: block;
+      height: 100%;
+      width: 0;
+      background: var(--pink);
+      border-radius: inherit;
+    }
+
+    .decision-option ul {
+      padding-left: 18px;
+      margin: 12px 0;
+    }
+
+    .decision-option li {
+      font-size: 12px;
+      line-height: 1.8;
+      color: var(--muted);
+      margin-bottom: 5px;
+    }
+
+    .decision-compare {
+      overflow-x: auto;
+      margin-top: 16px;
+    }
+
+    .decision-compare table {
+      width: 100%;
+      min-width: 570px;
+      border-collapse: collapse;
+    }
+
+    .decision-compare th,
+    .decision-compare td {
+      padding: 13px;
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+      font-size: 12px;
+      line-height: 1.7;
+    }
+
+    .decision-compare th {
+      background: #FFF5F8;
+      color: var(--muted);
+    }
+
+    .decision-list {
+      display: grid;
+      gap: 10px;
+      padding: 0;
+      margin: 17px 0 0;
+      list-style: none;
+    }
+
+    .decision-list li {
+      padding: 13px;
+      background: #FFFAFC;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      font-size: 13px;
+      line-height: 1.8;
+    }
+
+    .decision-warning {
+      border-left: 4px solid var(--pink);
+      background: #FFF5F7;
+      padding: 15px;
+      margin-top: 18px;
+      color: var(--muted);
+      border-radius: 8px;
+      font-size: 12px;
+      line-height: 1.8;
+    }
+
+    .decision-error {
+      display: none;
+      color: #B42332;
+      background: #FFF0F0;
+      border-radius: 9px;
+      padding: 12px;
+      font-size: 13px;
+      margin-top: 15px;
+    }
+
+    .decision-error.visible { display: block; }
+
+    .decision-footer {
+      text-align: center;
+      margin-top: 25px;
+      font-size: 11px;
+      line-height: 1.8;
+      color: var(--muted);
+    }
+
+    @media (max-width: 680px) {
+      .decision-page { padding: 16px 12px 35px; }
+      .decision-panel { padding: 17px; }
+      .decision-form-grid,
+      .decision-option-grid,
+      .decision-stats { grid-template-columns: 1fr; }
+      .decision-field.full { grid-column: auto; }
+    }
+  </style>
+</head>
+
+<body>
+<main class="decision-page">
+
+  <nav class="decision-nav">
+    <a class="back-link" href="dashboard.html">← Dashboard</a>
+    <a class="back-link" href="investments.html">Explore investments →</a>
+  </nav>
+
+  <section class="decision-hero">
+    <span class="decision-eyebrow">FINPATH · SMARTER FINANCIAL CHOICES</span>
+    <h1>Make financial decisions with more clarity.</h1>
+    <p>
+      Every financial decision depends on your goals, timeline,
+      available money and comfort with uncertainty. Compare options,
+      understand trade-offs and explore your next steps before deciding.
+    </p>
+  </section>
+
+  <section class="decision-panel">
+    <h2>Tell us about your situation</h2>
+    <p class="decision-muted">
+      Fill in these details to generate a comparison. Enter approximate
+      values if you do not know the exact amounts.
+    </p>
+
+    <form id="decisionForm">
+      <div class="decision-form-grid">
+
+        <div class="decision-field">
+          <label for="goal">What are you planning for?</label>
+          <select id="goal" required>
+            <option value="emergency">Emergency savings</option>
+            <option value="education">Education fees</option>
+            <option value="purchase">A major purchase</option>
+            <option value="home">A home or property goal</option>
+            <option value="retirement">Long-term wealth or retirement</option>
+            <option value="general">General savings and growth</option>
+          </select>
+        </div>
+
+        <div class="decision-field">
+          <label for="target">Target amount (₹)</label>
+          <input id="target" type="text"
+  inputmode="decimal"
+  pattern="[0-9]+([.][0-9]{1,2})?"
+  placeholder="Enter any amount, e.g. 2576"
+  value="200000"
+  required>
+        </div>
+
+        <div class="decision-field">
+          <label for="saved">Amount already saved for this goal (₹)</label>
+          <input id="saved" type="number" min="0"
+            max="100000000000" step="500" value="20000" required>
+        </div>
+
+        <div class="decision-field">
+          <label for="monthly">Amount you can set aside monthly (₹)</label>
+          <input id="monthly" type="number" min="0"
+            max="1000000000" step="500" value="5000" required>
+        </div>
+
+        <div class="decision-field">
+          <label for="timeline">When do you need the money?</label>
+          <select id="timeline" required>
+            <option value="1">Within 1 year</option>
+            <option value="3" selected>Within 1–3 years</option>
+            <option value="5">In 3–5 years</option>
+            <option value="10">In 5–10 years</option>
+            <option value="20">More than 10 years</option>
+          </select>
+        </div>
+
+        <div class="decision-field">
+          <label for="risk">How comfortable are you with losses?</label>
+          <select id="risk" required>
+            <option value="low">Low — avoiding losses is important</option>
+            <option value="medium" selected>
+              Medium — some fluctuations are acceptable
+            </option>
+            <option value="high">
+              High — I can tolerate substantial fluctuations
+            </option>
+          </select>
+        </div>
+
+        <div class="decision-field">
+          <label for="access">How quickly might you need the money?</label>
+          <select id="access" required>
+            <option value="immediate">Anytime, without delay</option>
+            <option value="flexible" selected>
+              I can plan withdrawals in advance
+            </option>
+            <option value="locked">
+              I can leave some money untouched
+            </option>
+          </select>
+        </div>
+
+        <div class="decision-field">
+          <label for="income">Monthly take-home household income (₹)</label>
+          <input id="income" type="number" min="0"
+            max="1000000000" step="1000" value="30000" required>
+        </div>
+
+        <div class="decision-field">
+          <label for="expenses">Essential monthly expenses (₹)</label>
+          <input id="expenses" type="number" min="0"
+            max="1000000000" step="500" value="18000" required>
+        </div>
+
+        <div class="decision-field">
+          <label for="emergency">Accessible emergency savings (₹)</label>
+          <input id="emergency" type="number" min="0"
+            max="100000000000" step="1000" value="30000" required>
+        </div>
+
+        <div class="decision-field full">
+          <label class="decision-check" for="debt">
+            <input id="debt" type="checkbox">
+            <span>
+              <strong>I have high-interest debt</strong><br>
+              For example, outstanding credit-card debt or a high-interest
+              personal loan. Repayment terms may change which choice
+              deserves attention first.
+            </span>
+          </label>
+        </div>
+
+      </div>
+
+      <div class="decision-actions">
+        <button class="decision-button" type="submit">
+          Compare my options →
+        </button>
+        <button class="decision-button secondary" type="reset">
+          Reset form
+        </button>
+      </div>
+
+      <div class="decision-error" id="decisionError"
+        role="alert" aria-live="polite"></div>
+    </form>
+  </section>
+
+  <div class="decision-results" id="decisionResults" aria-live="polite">
+
+    <section class="decision-summary">
+      <span class="decision-eyebrow">YOUR FINANCIAL SNAPSHOT</span>
+      <h2 id="summaryTitle">Your comparison is ready</h2>
+      <p id="summaryText"></p>
+
+      <div class="decision-stats">
+        <div class="decision-stat">
+          <span>Remaining goal amount</span>
+          <strong id="remainingStat">₹0</strong>
+        </div>
+        <div class="decision-stat">
+          <span>Monthly amount available after expenses</span>
+          <strong id="surplusStat">₹0</strong>
+        </div>
+        <div class="decision-stat">
+          <span>Emergency savings coverage</span>
+          <strong id="emergencyStat">0 months</strong>
+        </div>
+      </div>
+    </section>
+
+    <section class="decision-panel">
+      <h2>What should you consider first?</h2>
+      <p class="decision-muted">
+        These are rule-based planning insights from your inputs,
+        not guaranteed outcomes or a personalized regulated financial
+        recommendation.
+      </p>
+      <ul class="decision-list" id="insightList"></ul>
+    </section>
+
+    <section class="decision-panel">
+      <h2>Compare your options</h2>
+      <p class="decision-muted">
+        The comparison reflects your stated preferences. A higher fit
+        score means more of the simple criteria match your answers;
+        it does not mean higher returns or lower financial risk.
+      </p>
+
+      <div class="decision-option-grid" id="optionGrid"></div>
+
+      <div class="decision-warning">
+        Important: the scores are a transparent educational heuristic,
+        not a prediction of investment performance. They do not account
+        for all fees, taxes, product terms, eligibility or individual
+        circumstances.
+      </div>
+    </section>
+
+    <section class="decision-panel">
+      <h2>Side-by-side comparison</h2>
+      <p class="decision-muted">
+        Compare access, uncertainty and the main trade-off for each option.
+      </p>
+      <div class="decision-compare">
+        <table>
+          <thead>
+            <tr>
+              <th>Option</th>
+              <th>Access to money</th>
+              <th>Risk / uncertainty</th>
+              <th>Main trade-off</th>
+            </tr>
+          </thead>
+          <tbody id="compareBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="decision-panel">
+      <h2>Your next steps</h2>
+      <p class="decision-muted">
+        Use this checklist to investigate your options before committing
+        money.
+      </p>
+      <ul class="decision-list" id="nextSteps"></ul>
+
+      <div class="decision-actions">
+        <button class="decision-button" id="printButton" type="button">
+          Print / Save comparison
+        </button>
+        <button class="decision-button secondary" id="editButton" type="button">
+          Edit my answers
+        </button>
+      </div>
+    </section>
+  </div>
+
+  <p class="decision-footer">
+    FinPath is an educational decision-support tool. It does not
+    guarantee returns, evaluate every financial product or replace
+    qualified financial advice. All calculations use the values
+    you enter and simplified rules.
+  </p>
+</main>
+
+<script>
+"use strict";
+
+const form = document.getElementById("decisionForm");
+const errorBox = document.getElementById("decisionError");
+const results = document.getElementById("decisionResults");
+
+const rupees = value =>
+  "₹" + Number(value).toLocaleString("en-IN", {
+    maximumFractionDigits: 0
+  });
+
+function addTextElement(tag, className, text) {
+  const element = document.createElement(tag);
+  if (className) element.className = className;
+  element.textContent = text;
+  return element;
+}
+
+function addListItem(list, text) {
+  const item = document.createElement("li");
+  item.textContent = text;
+  list.appendChild(item);
+}
+
+function readNumber(id) {
+  return Number(document.getElementById(id).value);
+}
+
+function clearResults() {
+  results.classList.remove("visible");
+  errorBox.classList.remove("visible");
+  errorBox.textContent = "";
+}
+
+function getInputs() {
+  return {
+    goal: document.getElementById("goal").value,
+    target: readNumber("target"),
+    saved: readNumber("saved"),
+    monthly: readNumber("monthly"),
+    years: Number(document.getElementById("timeline").value),
+    risk: document.getElementById("risk").value,
+    access: document.getElementById("access").value,
+    income: readNumber("income"),
+    expenses: readNumber("expenses"),
+    emergency: readNumber("emergency"),
+    debt: document.getElementById("debt").checked
+  };
+}
+
+function validate(data) {
+  const fields = [
+    ["Target amount", data.target],
+    ["Current goal savings", data.saved],
+    ["Monthly savings", data.monthly],
+    ["Monthly income", data.income],
+    ["Essential expenses", data.expenses],
+    ["Emergency savings", data.emergency]
+  ];
+
+  for (const [label, value] of fields) {
+    if (!Number.isFinite(value) || value < 0) {
+      return label + " must be a valid non-negative number.";
+    }
+  }
+
+  if (data.target <= 0) {
+    return "Target amount must be greater than zero.";
+  }
+
+  if (data.target > 100000000000 ||
+      data.saved > 100000000000 ||
+      data.emergency > 100000000000 ||
+      data.monthly > 1000000000 ||
+      data.income > 1000000000 ||
+      data.expenses > 1000000000) {
+    return "One of your amounts is too large. Please check the values.";
+  }
+
+  return "";
+}
+
+const goalNames = {
+  emergency: "emergency savings",
+  education: "education fees",
+  purchase: "a major purchase",
+  home: "a home or property goal",
+  retirement: "long-term wealth or retirement",
+  general: "general savings and growth"
+};
+
+function buildOptions(data, surplus, emergencyMonths, remaining) {
+  const shortHorizon = data.years <= 3;
+  const longHorizon = data.years >= 10;
+
+  const emergencyAdequate = emergencyMonths >= 3;
+  const urgentGoal = data.goal === "emergency";
+
+  const options = [
+    {
+      id: "accessible",
+      name: "Accessible savings",
+      short: "Savings account or similar accessible deposit",
+      access: "Generally high; check account terms",
+      risk: "Low market exposure; inflation can reduce purchasing power",
+      tradeoff: "Easy access, but returns may be lower than other options",
+      pros: [
+        "Useful for money that may be needed unexpectedly",
+        "Simple to understand and monitor",
+        "Can help keep essential funds separate"
+      ],
+      cons: [
+        "Interest may not keep pace with inflation",
+        "Account terms and applicable protections still matter"
+      ],
+      score: 0
+    },
+    {
+      id: "deposit",
+      name: "Fixed / recurring deposits",
+      short: "Bank fixed deposit or recurring deposit",
+      access: "Depends on the term and early-withdrawal rules",
+      risk: "Lower market exposure; terms and institution matter",
+      tradeoff: "More predictable stated interest, but less flexibility may apply",
+      pros: [
+        "Can support a savings plan with a defined timeline",
+        "Interest terms can be checked before opening",
+        "Recurring deposits may support regular contributions"
+      ],
+      cons: [
+        "Premature withdrawal may carry conditions or penalties",
+        "Returns, tax treatment and deposit protection must be checked"
+      ],
+      score: 0
+    },
+    {
+      id: "debtfund",
+      name: "Debt mutual funds",
+      short: "Market-linked funds investing mainly in debt securities",
+      access: "Redemption timing and charges depend on the fund",
+      risk: "Market, interest-rate and credit risks remain",
+      tradeoff: "Potential diversification, but neither capital nor returns are guaranteed",
+      pros: [
+        "Different funds provide exposure to different debt securities",
+        "May be worth researching for suitable investment horizons"
+      ],
+      cons: [
+        "NAV can fall; credit and interest-rate risks vary",
+        "Fees, taxes and redemption terms need investigation"
+      ],
+      score: 0
+    },
+    {
+      id: "equity",
+      name: "Diversified equity mutual funds",
+      short: "Market-linked funds investing in shares",
+      access: "Usually redeemable, but settlement and market conditions apply",
+      risk: "High market volatility; losses can be substantial",
+      tradeoff: "Long-term growth potential with significant uncertainty",
+      pros: [
+        "Diversification may reduce dependence on a single company",
+        "May be relevant to research for long-term goals"
+      ],
+      cons: [
+        "Values can fall sharply, including near your goal date",
+        "Unsuitable for money that must be available at a fixed near-term date"
+      ],
+      score: 0
+    }
+  ];
+
+  for (const option of options) {
+    let score = 0;
+
+    if (option.id === "accessible") {
+      score += data.access === "immediate" ? 35 : 15;
+      score += shortHorizon ? 25 : 10;
+      score += data.risk === "low" ? 20 : 10;
+      score += urgentGoal ? 20 : 5;
+    }
+
+    if (option.id === "deposit") {
+      score += data.access === "locked" ? 25 :
+        data.access === "flexible" ? 20 : 5;
+      score += shortHorizon ? 20 : 15;
+      score += data.risk === "low" ? 25 : 15;
+      score += urgentGoal ? 0 : 10;
+    }
+
+    if (option.id === "debtfund") {
+      score += data.access === "immediate" ? 5 : 15;
+      score += shortHorizon ? 5 : 15;
+      score += data.risk === "low" ? 5 :
+        data.risk === "medium" ? 20 : 15;
+      score += data.goal === "general" ? 10 : 5;
+    }
+
+    if (option.id === "equity") {
+      score += longHorizon ? 35 : shortHorizon ? 0 : 20;
+      score += data.risk === "high" ? 30 :
+        data.risk === "medium" ? 15 : 0;
+      score += data.goal === "retirement" ||
+        data.goal === "general" ? 20 : 5;
+      score += data.access === "locked" ? 10 : 0;
+    }
+
+    if (data.debt) {
+      score -= option.id === "equity" ? 20 : 10;
+    }
+
+    if (!emergencyAdequate && !urgentGoal) {
+      score -= option.id === "equity" ? 15 :
+        option.id === "debtfund" ? 10 : 0;
+    }
+
+    if (surplus <= 0) {
+      score -= option.id === "equity" || option.id === "debtfund" ? 15 : 0;
+    }
+
+    if (remaining === 0) {
+      score = 0;
+    }
+
+    option.score = Math.max(0, Math.min(100, score));
+  }
+
+  return options.sort((a, b) => b.score - a.score);
+}
+
+function renderOptions(options) {
+  const grid = document.getElementById("optionGrid");
+  const compare = document.getElementById("compareBody");
+
+  grid.replaceChildren();
+  compare.replaceChildren();
+
+  options.forEach((option, index) => {
+    const card = document.createElement("article");
+    card.className = "decision-option" + (index === 0 ? " best" : "");
+
+    const tag = addTextElement(
+      "span",
+      "decision-tag" + (index === 0 ? " green" : " neutral"),
+      index === 0 ? "STRONGEST RULE-BASED FIT" : "ALTERNATIVE TO EXPLORE"
+    );
+
+    const title = addTextElement("h3", "", option.name);
+    const description = addTextElement("p", "", option.short);
+
+    const scoreLabel = addTextElement(
+      "p", "", "Preference fit: " + option.score + "/100"
+    );
+
+    const meter = document.createElement("div");
+    meter.className = "decision-meter";
+
+    const fill = document.createElement("span");
+    fill.style.width = option.score + "%";
+    meter.appendChild(fill);
+
+    const prosTitle = addTextElement("strong", "", "Potential advantages");
+    const pros = document.createElement("ul");
+
+    option.pros.forEach(text => {
+      pros.appendChild(addTextElement("li", "", text));
+    });
+
+    const consTitle = addTextElement("strong", "", "Trade-offs to check");
+    consTitle.style.display = "block";
+    consTitle.style.marginTop = "15px";
+
+    const cons = document.createElement("ul");
+    option.cons.forEach(text => {
+      cons.appendChild(addTextElement("li", "", text));
+    });
+
+    card.append(
+      tag, title, description, scoreLabel, meter,
+      prosTitle, pros, consTitle, cons
+    );
+
+    grid.appendChild(card);
+
+    const row = document.createElement("tr");
+    [
+      option.name,
+      option.access,
+      option.risk,
+      option.tradeoff
+    ].forEach(text => row.appendChild(addTextElement("td", "", text)));
+
+    compare.appendChild(row);
+  });
+}
+
+function createInsights(data, surplus, emergencyMonths, remaining, monthsNeeded) {
+  const insights = [];
+
+  if (data.debt) {
+    insights.push(
+      "You reported high-interest debt. Compare the effective interest " +
+      "cost and repayment conditions with your other priorities before " +
+      "committing extra money to investments."
+    );
+  }
+
+  if (surplus <= 0) {
+    insights.push(
+      "Your stated essential expenses are equal to or greater than your " +
+      "income. Review your budget and avoid assuming you can sustain " +
+      "additional monthly contributions."
+    );
+  } else {
+    insights.push(
+      "Based on your entries, the amount left after essential expenses " +
+      "is " + rupees(surplus) + " per month. This does not include every " +
+      "possible expense or irregular bill."
+    );
+  }
+
+  if (emergencyMonths < 3) {
+    insights.push(
+      "Your accessible emergency savings cover about " +
+      emergencyMonths.toFixed(1) +
+      " months of essential expenses. Consider building an emergency " +
+      "reserve before exposing essential money to market risk. Three " +
+      "months is a planning reference, not a universal requirement."
+    );
+  } else {
+    insights.push(
+      "Your accessible savings cover about " +
+      emergencyMonths.toFixed(1) +
+      " months of essential expenses. Check whether that reserve is " +
+      "sufficient for your household and circumstances."
+    );
+  }
+
+  if (data.goal === "emergency") {
+    insights.push(
+      "Because your selected goal is emergency savings, accessibility " +
+      "and reliability are important. Market-linked investments may " +
+      "lose value when you need the money."
+    );
+  } else if (data.years <= 3) {
+    insights.push(
+      "Your goal is within three years. Consider how a market decline, " +
+      "withdrawal restrictions or delayed access could affect your deadline."
+    );
+  } else if (data.years >= 10) {
+    insights.push(
+      "Your longer time horizon allows you to research a wider range " +
+      "of options, but a long horizon does not guarantee positive returns."
+    );
+  }
+
+  if (remaining > 0 && data.monthly > 0) {
+    insights.push(
+      "Without interest or investment growth, reaching the remaining " +
+      rupeesText(remaining) + " at " + rupees(data.monthly) +
+      " per month would take about " + monthsNeeded +
+      " months. This is a simple savings estimate, not a forecast."
+    );
+  } else if (remaining === 0) {
+    insights.push(
+      "Your saved amount meets or exceeds the target you entered. " +
+      "Check whether the funds are accessible and whether the goal " +
+      "amount still reflects your actual needs."
+    );
+  } else {
+    insights.push(
+      "Your monthly contribution is zero. Review your budget and goal " +
+      "timeline to understand what options are feasible."
+    );
+  }
+
+  return insights;
+}
+
+function rupeesText(value) {
+  return rupees(value);
+}
+
+function createNextSteps(data, emergencyMonths, remaining) {
+  const steps = [];
+
+  if (data.debt) {
+    steps.push(
+      "List your debts, interest rates, minimum payments and early " +
+      "repayment conditions. Compare the cost of high-interest debt."
+    );
+  }
+
+  if (emergencyMonths < 3) {
+    steps.push(
+      "Estimate essential monthly expenses and decide on a suitable " +
+      "emergency reserve that remains accessible."
+    );
+  }
+
+  if (remaining > 0 && data.monthly > 0) {
+    steps.push(
+      "Check whether the target and deadline are realistic using " +
+      "your monthly contribution, without relying on assumed returns."
+    );
+  }
+
+  steps.push(
+    "Compare actual product terms, fees, taxes, withdrawal rules and " +
+    "applicable protections before opening an account or investing."
+  );
+
+  steps.push(
+    "Discuss important household goals and constraints with the people " +
+    "affected by the decision. Update the comparison if their needs differ."
+  );
+
+  steps.push(
+    "Revisit your plan when income, expenses, family responsibilities " +
+    "or the target date changes."
+  );
+
+  return steps;
+}
+
+function showList(id, items) {
+  const list = document.getElementById(id);
+  list.replaceChildren();
+
+  items.forEach(text => addListItem(list, text));
+}
+
+form.addEventListener("submit", event => {
+  event.preventDefault();
+
+  const data = getInputs();
+  const validationMessage = validate(data);
+
+  if (validationMessage) {
+    errorBox.textContent = validationMessage;
+    errorBox.classList.add("visible");
+    results.classList.remove("visible");
+    return;
+  }
+
+  errorBox.classList.remove("visible");
+
+  const surplus = data.income - data.expenses;
+  const remaining = Math.max(0, data.target - data.saved);
+
+  const emergencyMonths = data.expenses > 0
+    ? data.emergency / data.expenses
+    : data.emergency > 0 ? Infinity : 0;
+
+  const monthsNeeded = data.monthly > 0
+    ? Math.ceil(remaining / data.monthly)
+    : null;
+
+  const options = buildOptions(
+    data, surplus, emergencyMonths, remaining
+  );
+
+  document.getElementById("summaryTitle").textContent =
+    "Your plan for " + goalNames[data.goal];
+
+  document.getElementById("summaryText").textContent =
+    "This comparison uses the goal, timeline, risk comfort, liquidity " +
+    "preference and budget details you supplied. It highlights factors " +
+    "to investigate rather than predicting which investment will perform best.";
+
+  document.getElementById("remainingStat").textContent =
+    rupees(remaining);
+
+  document.getElementById("surplusStat").textContent =
+    rupees(surplus);
+
+  document.getElementById("emergencyStat").textContent =
+    Number.isFinite(emergencyMonths)
+      ? emergencyMonths.toFixed(1) + " months"
+      : "No expenses entered";
+
+  showList(
+    "insightList",
+    createInsights(data, surplus, emergencyMonths, remaining, monthsNeeded)
+  );
+
+  renderOptions(options);
+
+  showList(
+    "nextSteps",
+    createNextSteps(data, emergencyMonths, remaining)
+  );
+
+  results.classList.add("visible");
+  results.scrollIntoView({ behavior: "smooth", block: "start" });
+});
+
+form.addEventListener("reset", () => {
+  clearResults();
+});
+
+document.getElementById("editButton").addEventListener("click", () => {
+  document.getElementById("goal").focus();
+  form.scrollIntoView({ behavior: "smooth", block: "start" });
+});
+
+document.getElementById("printButton").addEventListener("click", () => {
+  window.print();
+});
+</script>
+
+<style>
+  @media print {
+    body { background: white !important; }
+    .decision-nav,
+    .decision-actions,
+    #decisionForm,
+    .decision-hero { display: none !important; }
+    .decision-page { max-width: 100%; padding: 0; }
+    .decision-panel,
+    .decision-summary,
+    .decision-option { box-shadow: none; break-inside: avoid; }
+    .decision-results { display: block !important; }
+  }
+</style>
+</body>
+</html>

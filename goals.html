@@ -1,0 +1,594 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Goals Tracker | FinPath</title>
+  <link rel="stylesheet" href="style.css">
+
+  <style>
+    body { background:#FFF5F7; color:#421629; }
+    .page { max-width:1150px; margin:auto; padding:30px 22px 60px; }
+    .page-top { display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:28px; }
+    .page-top p, .muted { color:#795C69; font-size:13px; }
+    .heading { margin-bottom:25px; }
+    .heading h1 { font-size:clamp(27px,4vw,38px); margin:10px 0; letter-spacing:-1px; }
+    .pink { color:#D91F5D; }
+    .stats { display:grid; grid-template-columns:repeat(3,1fr); gap:15px; margin-bottom:25px; }
+    .card { background:#FFF; border:1px solid #F0DDE4; border-radius:15px; padding:21px; min-width:0; }
+    .card p { color:#795C69; font-size:12px; }
+    .card h2 { font-size:25px; margin:7px 0; overflow-wrap:anywhere; }
+    .section-title { font-size:17px; margin-bottom:16px; }
+    .main-grid { display:grid; grid-template-columns:minmax(270px,.8fr) minmax(0,1.5fr); gap:20px; align-items:start; }
+    .field { display:grid; gap:6px; margin-bottom:15px; }
+    .field label { font-size:12px; font-weight:650; }
+    .field input, .field select { width:100%; padding:12px; border:1px solid #E9CBD7; border-radius:9px; background:#FFFAFC; color:#421629; font:inherit; font-size:13px; }
+    .field input:focus, .field select:focus { outline:2px solid #F4B8CC; border-color:#D91F5D; }
+    .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:0 12px; }
+    .btn-pink { background:#D91F5D; color:white; border:1px solid #D91F5D; border-radius:9px; padding:12px 17px; font-weight:650; cursor:pointer; }
+    .btn-pink:hover { background:#A51246; }
+    .btn-light { background:white; color:#421629; border:1px solid #E9CBD7; border-radius:9px; padding:9px 12px; cursor:pointer; font-size:12px; }
+    .btn-light:hover { background:#FFF0F5; }
+    .form-button { width:100%; }
+    .notice { font-size:12px; color:#795C69; line-height:1.6; margin-top:12px; }
+    .goal-list { display:grid; gap:14px; }
+    .goal-card { background:#FFF; border:1px solid #F0DDE4; border-radius:15px; padding:20px; }
+    .goal-top { display:flex; justify-content:space-between; align-items:flex-start; gap:10px; }
+    .goal-name { font-size:16px; font-weight:750; }
+    .goal-type { color:#795C69; font-size:11px; margin-top:4px; }
+    .goal-amount { font-size:21px; font-weight:750; margin-top:18px; }
+    .goal-small { color:#795C69; font-size:11px; margin-top:3px; }
+    .progress-track { height:8px; background:#F9DCE6; border-radius:20px; overflow:hidden; margin:13px 0; }
+    .progress-fill { height:100%; background:#D91F5D; border-radius:20px; }
+    .goal-details { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:15px; }
+    .goal-details span { display:block; font-size:11px; color:#795C69; }
+    .goal-details strong { display:block; font-size:13px; margin-top:3px; overflow-wrap:anywhere; }
+    .goal-actions { display:flex; gap:8px; margin-top:18px; flex-wrap:wrap; }
+    .badge { background:#FCE8EF; color:#A51246; border-radius:20px; padding:5px 9px; font-size:10px; font-weight:700; white-space:nowrap; }
+    .badge.good { background:#E5F6EC; color:#176B49; }
+    .badge.warn { background:#FFF0DE; color:#995516; }
+    .empty { text-align:center; padding:40px 15px; color:#795C69; border:1px dashed #E9CBD7; border-radius:14px; }
+    .empty strong { display:block; color:#421629; margin-bottom:7px; }
+    .message { display:none; font-size:12px; padding:10px; border-radius:8px; margin-bottom:12px; }
+    .message.show { display:block; }
+    .message.error { background:#FFF0F0; color:#B42332; }
+    .message.success { background:#E6F8EF; color:#176B49; }
+    .review { margin-top:22px; background:#FCE8EF; border:1px solid #F0DDE4; padding:20px; border-radius:15px; }
+    .review h3 { font-size:16px; margin-bottom:7px; }
+    .review p { color:#795C69; font-size:12px; line-height:1.7; }
+    .analysis-grid { display:grid; grid-template-columns:minmax(0,1.2fr) minmax(0,.8fr); gap:18px; margin-top:22px; }
+    .analysis-card { background:#FFF; border:1px solid #F0DDE4; border-radius:15px; padding:21px; min-width:0; }
+    .analysis-card h3 { font-size:16px; margin-bottom:6px; }
+    .analysis-card .muted { margin-bottom:16px; }
+    .goal-chart-row { display:grid; grid-template-columns:minmax(90px,1fr) minmax(90px,2fr) 55px; align-items:center; gap:10px; margin:14px 0; font-size:11px; }
+    .goal-chart-name { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .mini-track { height:10px; background:#F9DCE6; border-radius:20px; overflow:hidden; }
+    .mini-fill { height:100%; background:#D91F5D; border-radius:20px; }
+    .history-list { display:grid; gap:10px; }
+    .history-item { display:flex; justify-content:space-between; align-items:flex-start; gap:10px; padding:11px 0; border-bottom:1px solid #F5E5EB; font-size:12px; }
+    .history-item:last-child { border-bottom:0; }
+    .history-item small { display:block; color:#795C69; margin-top:4px; }
+    .history-amount { color:#176B49; font-weight:750; white-space:nowrap; }
+    @media(max-width:800px) { .analysis-grid { grid-template-columns:1fr; } }
+    @media(max-width:800px) { .main-grid { grid-template-columns:1fr; } }
+    @media(max-width:520px) { .page { padding:20px 13px 40px; } .stats { grid-template-columns:1fr; gap:10px; } .card { padding:16px; } .form-grid { grid-template-columns:1fr; } }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <a href="dashboard.html" class="brand">
+      <span class="brand-icon">F</span>
+      FinPath<span class="brand-dot">.</span>
+    </a>
+    <a href="dashboard.html" class="btn btn-outline">← Dashboard</a>
+  </header>
+
+  <main class="page">
+    <div class="page-top">
+      <div>
+        <p>FINANCIAL PLANNING / GOALS</p>
+      </div>
+      <button class="btn-light" id="resetDemo">Reset sample data</button>
+    </div>
+
+    <section class="heading">
+      <span class="eyebrow">YOUR FUTURE, YOUR PLAN</span>
+      <h1>Every goal starts with <span class="pink">a plan.</span></h1>
+      <p class="muted">Set your targets, track your savings and understand what it takes to reach them.</p>
+    </section>
+
+    <section class="stats">
+      <article class="card">
+        <p>TOTAL GOALS</p>
+        <h2 id="totalGoals">0</h2>
+        <p>Financial targets you're tracking</p>
+      </article>
+      <article class="card">
+        <p>TOTAL TARGET AMOUNT</p>
+        <h2 id="totalTarget">₹0</h2>
+        <p>Across all your goals</p>
+      </article>
+      <article class="card">
+        <p>AMOUNT ALREADY SAVED</p>
+        <h2 class="pink" id="totalSaved">₹0</h2>
+        <p id="overallProgress">0% of total targets</p>
+      </article>
+    </section>
+
+    <div class="main-grid">
+      <section class="card">
+        <h2 class="section-title">＋ Create a financial goal</h2>
+        <div id="message" class="message" role="status" aria-live="polite"></div>
+
+        <form id="goalForm">
+          <div class="field">
+            <label for="goalName">Goal name</label>
+            <input id="goalName" maxlength="70" placeholder="e.g. Higher education" required>
+          </div>
+
+          <div class="field">
+            <label for="goalType">Goal category</label>
+            <select id="goalType" required>
+              <option value="Education">Higher education</option>
+              <option value="Home">Buy a home</option>
+              <option value="Emergency fund">Emergency fund</option>
+              <option value="Retirement">Retirement</option>
+              <option value="Debt repayment">Debt repayment</option>
+              <option value="Travel">Travel</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+
+          <div class="form-grid">
+            <div class="field">
+              <label for="target">Target amount (₹)</label>
+              <input id="target" type="number" min="1" max="1000000000000" step="0.01" placeholder="500000" required>
+            </div>
+            <div class="field">
+              <label for="saved">Already saved (₹)</label>
+              <input id="saved" type="number" min="0" max="1000000000000" step="0.01" value="0" required>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="deadline">Target date</label>
+            <input id="deadline" type="date" required>
+          </div>
+
+          <div class="field">
+            <label for="monthly">Planned monthly contribution (₹)</label>
+            <input id="monthly" type="number" min="0" max="1000000000000" step="0.01" value="5000" required>
+          </div>
+
+          <button type="submit" class="btn-pink form-button">＋ Add goal</button>
+          <p class="notice">Calculations assume regular monthly contributions and no investment returns. They are estimates, not guarantees.</p>
+        </form>
+      </section>
+
+      <section>
+        <div class="goal-top" style="margin-bottom:15px">
+          <h2 class="section-title" style="margin:0">Your financial goals</h2>
+          <span class="badge" id="goalCountBadge">0 goals</span>
+        </div>
+        <div id="goalList" class="goal-list"></div>
+
+        <div class="review">
+          <h3>✦ Goal review</h3>
+          <p id="reviewText">Add a goal to see your progress, monthly requirements and estimated shortfalls here.</p>
+        </div>
+      </section>
+    </div>
+
+    <section class="analysis-grid">
+      <article class="analysis-card">
+        <h3>Goal progress analysis</h3>
+        <p class="muted">Compare how much you have saved with each target.</p>
+        <div id="goalChart"><p class="muted">Add a goal to see your analysis.</p></div>
+      </article>
+      <article class="analysis-card">
+        <h3>Recent savings activity</h3>
+        <p class="muted">Contributions recorded when you update a goal's total saved amount.</p>
+        <div id="goalHistory" class="history-list"><p class="muted">No contributions recorded yet.</p></div>
+      </article>
+    </section>
+  </main>
+
+  <script>
+    const STORAGE_KEY = "finpathGoals";
+    const HISTORY_KEY = "finpathGoalHistory";
+    let goalHistory = [];
+    try { const h = JSON.parse(localStorage.getItem(HISTORY_KEY) || "[]"); goalHistory = Array.isArray(h) ? h : []; } catch { goalHistory = []; }
+    function saveHistory() { try { localStorage.setItem(HISTORY_KEY, JSON.stringify(goalHistory)); } catch {} }
+    const money = n => "₹" + Math.round(n).toLocaleString("en-IN");
+
+    const dateInput = document.getElementById("deadline");
+    const today = new Date();
+    const minDate = new Date(today.getTime() - today.getTimezoneOffset() * 60000)
+      .toISOString().slice(0, 10);
+    dateInput.min = minDate;
+
+    let goals = [];
+
+    function loadGoals() {
+      try {
+        const data = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+        goals = Array.isArray(data) ? data.filter(g =>
+          g && typeof g.id === "string" &&
+          typeof g.name === "string" &&
+          Number.isFinite(g.target) && g.target > 0 &&
+          Number.isFinite(g.saved) && g.saved >= 0 &&
+          Number.isFinite(g.monthly) && g.monthly >= 0 &&
+          typeof g.deadline === "string"
+        ) : [];
+      } catch {
+        goals = [];
+      }
+    }
+
+    function saveGoals() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(goals));
+        return true;
+      } catch {
+        showMessage("Unable to save data in this browser. Check browser storage.", "error");
+        return false;
+      }
+    }
+
+    function showMessage(text, type) {
+      const el = document.getElementById("message");
+      el.textContent = text;
+      el.className = "message show " + type;
+    }
+
+    function monthsRemaining(deadline) {
+      const end = new Date(deadline + "T00:00:00");
+      const now = new Date();
+      const days = Math.max(0, (end - now) / 86400000);
+      return Math.max(0, Math.ceil(days / 30.4375));
+    }
+
+    function getStatus(goal) {
+      const remaining = Math.max(0, goal.target - goal.saved);
+      const months = monthsRemaining(goal.deadline);
+
+      if (remaining <= 0) {
+        return { text: "Goal reached", cls: "good" };
+      }
+
+      if (months === 0) {
+        return { text: "Deadline reached", cls: "warn" };
+      }
+
+      const required = remaining / months;
+
+      if (goal.monthly >= required) {
+        return { text: "On track", cls: "good" };
+      }
+
+      return { text: "Needs review", cls: "warn" };
+    }
+
+    function render() {
+      const totalTarget = goals.reduce((s, g) => s + g.target, 0);
+      const totalSaved = goals.reduce((s, g) => s + Math.min(g.saved, g.target), 0);
+      const pct = totalTarget > 0 ? totalSaved / totalTarget * 100 : 0;
+
+      document.getElementById("totalGoals").textContent = goals.length;
+      document.getElementById("totalTarget").textContent = money(totalTarget);
+      document.getElementById("totalSaved").textContent = money(totalSaved);
+      document.getElementById("overallProgress").textContent =
+        pct.toFixed(1) + "% of total targets";
+      document.getElementById("goalCountBadge").textContent =
+        goals.length + (goals.length === 1 ? " goal" : " goals");
+
+      const list = document.getElementById("goalList");
+      list.replaceChildren();
+
+      if (goals.length === 0) {
+        const empty = document.createElement("div");
+        empty.className = "empty";
+
+        const title = document.createElement("strong");
+        title.textContent = "Your goals start here";
+        const text = document.createElement("span");
+        text.textContent = "Use the form to add your first financial target.";
+
+        empty.append(title, text);
+        list.append(empty);
+      }
+
+      goals.forEach(goal => {
+        const remaining = Math.max(0, goal.target - goal.saved);
+        const progress = Math.min(100, goal.saved / goal.target * 100);
+        const months = monthsRemaining(goal.deadline);
+        const required = months > 0 ? remaining / months : remaining;
+        const status = getStatus(goal);
+
+        const card = document.createElement("article");
+        card.className = "goal-card";
+
+        const top = document.createElement("div");
+        top.className = "goal-top";
+
+        const titleWrap = document.createElement("div");
+        const name = document.createElement("div");
+        name.className = "goal-name";
+        name.textContent = goal.name;
+
+        const type = document.createElement("div");
+        type.className = "goal-type";
+        type.textContent = goal.type;
+
+        titleWrap.append(name, type);
+
+        const badge = document.createElement("span");
+        badge.className = "badge " + status.cls;
+        badge.textContent = status.text;
+
+        top.append(titleWrap, badge);
+
+        const amount = document.createElement("div");
+        amount.className = "goal-amount";
+        amount.textContent = money(goal.saved) + " saved";
+
+        const small = document.createElement("div");
+        small.className = "goal-small";
+        small.textContent = "Target: " + money(goal.target);
+
+        const track = document.createElement("div");
+        track.className = "progress-track";
+
+        const fill = document.createElement("div");
+        fill.className = "progress-fill";
+        fill.style.width = progress + "%";
+        track.append(fill);
+
+        const pctText = document.createElement("div");
+        pctText.className = "goal-small";
+        pctText.textContent = progress.toFixed(1) + "% complete";
+
+        const details = document.createElement("div");
+        details.className = "goal-details";
+
+        function detail(label, value) {
+          const wrap = document.createElement("div");
+          const labelEl = document.createElement("span");
+          labelEl.textContent = label;
+          const valueEl = document.createElement("strong");
+          valueEl.textContent = value;
+          wrap.append(labelEl, valueEl);
+          return wrap;
+        }
+
+        details.append(
+          detail("Amount remaining", money(remaining)),
+          detail("Monthly plan", money(goal.monthly)),
+          detail("Months remaining", String(months)),
+          detail("Needed per month", money(required))
+        );
+
+        const actions = document.createElement("div");
+        actions.className = "goal-actions";
+
+        const updateBtn = document.createElement("button");
+        updateBtn.className = "btn-pink";
+        updateBtn.type = "button";
+        updateBtn.textContent = "＋ Update savings";
+        updateBtn.addEventListener("click", () => updateSaved(goal.id));
+
+        const editBtn = document.createElement("button");
+        editBtn.className = "btn-light";
+        editBtn.type = "button";
+        editBtn.textContent = "Edit plan";
+        editBtn.addEventListener("click", () => editGoal(goal.id));
+
+        const deleteBtn = document.createElement("button");
+        deleteBtn.className = "btn-light";
+        deleteBtn.type = "button";
+        deleteBtn.textContent = "Delete";
+        deleteBtn.addEventListener("click", () => deleteGoal(goal.id));
+
+        actions.append(updateBtn, editBtn, deleteBtn);
+        card.append(top, amount, small, track, pctText, details, actions);
+        list.append(card);
+      });
+
+      renderGoalAnalysis();
+
+      const onTrack = goals.filter(g => getStatus(g).text === "On track").length;
+      const review = document.getElementById("reviewText");
+
+      if (goals.length === 0) {
+        review.textContent = "Add a goal to see your progress, monthly requirements and estimated shortfalls here.";
+      } else {
+        const shortfalls = goals.filter(g =>
+          getStatus(g).text === "Needs review" ||
+          getStatus(g).text === "Deadline reached"
+        ).length;
+
+        review.textContent = onTrack + " of " + goals.length +
+          " goals are currently on track based on your planned contributions. " +
+          (shortfalls > 0
+            ? shortfalls + " goal(s) may need a higher contribution, a later deadline or a revised target."
+            : "Review your progress regularly and update your plan when circumstances change.");
+      }
+    }
+
+    function renderGoalAnalysis() {
+      const chart = document.getElementById("goalChart");
+      chart.replaceChildren();
+      if (!goals.length) {
+        const p = document.createElement("p"); p.className = "muted"; p.textContent = "Add a goal to see your analysis."; chart.append(p);
+      } else {
+        goals.forEach(goal => {
+          const row = document.createElement("div"); row.className = "goal-chart-row";
+          const name = document.createElement("div"); name.className = "goal-chart-name"; name.textContent = goal.name;
+          name.title = goal.name;
+          const track = document.createElement("div"); track.className = "mini-track";
+          const fill = document.createElement("div"); fill.className = "mini-fill";
+          fill.style.width = Math.min(100, Math.max(0, goal.saved / goal.target * 100)) + "%";
+          track.append(fill);
+          const pct = document.createElement("strong"); pct.textContent = (Math.min(100, Math.max(0, goal.saved / goal.target * 100))).toFixed(0) + "%";
+          row.append(name, track, pct); chart.append(row);
+        });
+      }
+      const history = document.getElementById("goalHistory");
+      history.replaceChildren();
+      if (!goalHistory.length) {
+        const p = document.createElement("p"); p.className = "muted"; p.textContent = "No contributions recorded yet. Use Update savings to record progress."; history.append(p);
+      } else {
+        goalHistory.slice(0, 8).forEach(item => {
+          const row = document.createElement("div"); row.className = "history-item";
+          const left = document.createElement("div");
+          const name = document.createElement("strong"); name.textContent = item.goalName || "Goal contribution";
+          const date = document.createElement("small");
+          const parsed = new Date(item.date); date.textContent = Number.isNaN(parsed.getTime()) ? "Date unavailable" : parsed.toLocaleDateString("en-IN", { day:"numeric", month:"short", year:"numeric" });
+          left.append(name, date);
+          const amount = document.createElement("span"); amount.className = "history-amount"; amount.textContent = "+" + money(item.amount);
+          row.append(left, amount); history.append(row);
+        });
+      }
+    }
+
+    document.getElementById("goalForm").addEventListener("submit", event => {
+      event.preventDefault();
+
+      const name = document.getElementById("goalName").value.trim();
+      const type = document.getElementById("goalType").value;
+      const target = Number(document.getElementById("target").value);
+      const saved = Number(document.getElementById("saved").value);
+      const deadline = document.getElementById("deadline").value;
+      const monthly = Number(document.getElementById("monthly").value);
+
+      if (!name || !deadline || deadline < minDate ||
+          !Number.isFinite(target) || target <= 0 ||
+          !Number.isFinite(saved) || saved < 0 ||
+          !Number.isFinite(monthly) || monthly < 0 ||
+          target > 1e12 || saved > 1e12 || monthly > 1e12) {
+        showMessage("Please enter a valid name, future deadline and non-negative amounts.", "error");
+        return;
+      }
+
+      goals.push({
+        id: Date.now().toString() + Math.random().toString(16).slice(2),
+        name, type, target, saved, deadline, monthly
+      });
+
+      if (!saveGoals()) {
+        goals.pop();
+        return;
+      }
+
+      render();
+      event.target.reset();
+      document.getElementById("saved").value = "0";
+      document.getElementById("monthly").value = "5000";
+      showMessage("Goal added successfully!", "success");
+    });
+
+    function updateSaved(id) {
+      const goal = goals.find(g => g.id === id);
+      if (!goal) return;
+
+      const value = prompt("Enter your new total saved amount (₹):", goal.saved);
+      if (value === null) return;
+
+      if (value.trim() === "" || !Number.isFinite(Number(value)) ||
+          Number(value) < 0 || Number(value) > 1e12) {
+        showMessage("Enter a valid non-negative savings amount.", "error");
+        return;
+      }
+
+      const old = goal.saved;
+      goal.saved = Number(value);
+
+      if (!saveGoals()) {
+        goal.saved = old;
+        return;
+      }
+      const delta = goal.saved - old;
+      if (delta > 0) {
+        goalHistory.unshift({ id: Date.now().toString(), goalId: goal.id, goalName: goal.name, amount: delta, date: new Date().toISOString() });
+        goalHistory = goalHistory.slice(0, 100);
+        saveHistory();
+      }
+
+      render();
+      showMessage("Savings progress updated.", "success");
+    }
+
+    function editGoal(id) {
+      const goal = goals.find(g => g.id === id);
+      if (!goal) return;
+
+      const monthly = prompt("Planned monthly contribution (₹):", goal.monthly);
+      if (monthly === null) return;
+
+      const target = prompt("New target amount (₹):", goal.target);
+      if (target === null) return;
+
+      const deadline = prompt("New deadline (YYYY-MM-DD):", goal.deadline);
+      if (deadline === null) return;
+
+      if (monthly.trim() === "" || target.trim() === "" ||
+          !Number.isFinite(Number(monthly)) || Number(monthly) < 0 ||
+          !Number.isFinite(Number(target)) || Number(target) <= 0 ||
+          Number(monthly) > 1e12 || Number(target) > 1e12 ||
+          !/^\d{4}-\d{2}-\d{2}$/.test(deadline) ||
+          deadline < minDate ||
+          new Date(deadline + "T00:00:00").toISOString().slice(0, 10) !== deadline) {
+        showMessage("Please enter valid amounts and a future date.", "error");
+        return;
+      }
+
+      const old = { target: goal.target, monthly: goal.monthly, deadline: goal.deadline };
+      goal.target = Number(target);
+      goal.monthly = Number(monthly);
+      goal.deadline = deadline;
+
+      if (!saveGoals()) {
+        Object.assign(goal, old);
+        return;
+      }
+
+      render();
+      showMessage("Goal plan updated.", "success");
+    }
+
+    function deleteGoal(id) {
+      if (!confirm("Delete this goal? This cannot be undone.")) return;
+
+      const old = goals;
+      goals = goals.filter(g => g.id !== id);
+
+      if (!saveGoals()) {
+        goals = old;
+        return;
+      }
+
+      render();
+      showMessage("Goal deleted.", "success");
+    }
+
+    document.getElementById("resetDemo").addEventListener("click", () => {
+      if (!confirm("Delete all goals saved in this browser?")) return;
+
+      const old = goals;
+      goals = [];
+
+      if (!saveGoals()) {
+        goals = old;
+        return;
+      }
+
+      render();
+      showMessage("All goals cleared.", "success");
+    });
+
+    loadGoals();
+    render();
+  </script>
+</body>
+</html>
