@@ -1,0 +1,1272 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#FFF5F7">
+  <title>Investments | FinPath</title>
+  <link rel="stylesheet" href="style.css">
+
+  <style>
+    .investment-page {
+      max-width: 1150px;
+      margin: auto;
+      padding: 25px 20px 50px;
+    }
+
+    .investment-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 15px;
+      margin-bottom: 30px;
+    }
+
+    .investment-page h1 {
+      font-size: clamp(27px, 4vw, 38px);
+      margin-bottom: 8px;
+    }
+
+    .investment-page h2 {
+      font-size: 19px;
+      margin-bottom: 8px;
+    }
+
+    .investment-panel {
+      background: #FFFFFF;
+      border: 1px solid #F0DDE4;
+      border-radius: 16px;
+      padding: 24px;
+      margin-top: 22px;
+      min-width: 0;
+      box-shadow: 0 5px 20px rgba(120, 35, 70, 0.035);
+    }
+
+    .investment-field {
+      margin-top: 17px;
+    }
+
+    .investment-field label {
+      display: block;
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 7px;
+    }
+
+    .investment-field input,
+    .investment-field select {
+      box-sizing: border-box;
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #F0DDE4;
+      border-radius: 9px;
+      background: #FFF9FB;
+      color: #421629;
+      font: inherit;
+    }
+
+    .investment-result {
+      background: #FCE8EF;
+      border-radius: 12px;
+      padding: 18px;
+      margin-top: 20px;
+    }
+
+    .investment-result strong {
+      display: block;
+      font-size: 27px;
+      color: #A51246;
+      overflow-wrap: anywhere;
+      margin: 7px 0;
+    }
+
+    .investment-button {
+      border: 0;
+      border-radius: 9px;
+      background: #D91F5D;
+      color: #FFFFFF;
+      font-weight: 700;
+      padding: 12px 16px;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.2s;
+    }
+
+    .investment-button:hover {
+      background: #A51246;
+      transform: translateY(-1px);
+    }
+
+    .investment-button:disabled {
+      opacity: 0.6;
+      cursor: wait;
+      transform: none;
+    }
+
+    .investment-status {
+      color: #795C69;
+      font-size: 12px;
+      line-height: 1.7;
+      margin: 12px 0;
+      overflow-wrap: anywhere;
+    }
+
+    .investment-status.error {
+      color: #B42332;
+      background: #FFF0F0;
+      padding: 10px;
+      border-radius: 8px;
+    }
+
+    .investment-table-wrap {
+      width: 100%;
+      overflow-x: auto;
+      margin-top: 15px;
+    }
+
+    .investment-table {
+      width: 100%;
+      min-width: 580px;
+      border-collapse: collapse;
+      text-align: left;
+    }
+
+    .investment-table th,
+    .investment-table td {
+      padding: 12px;
+      border-bottom: 1px solid #F0DDE4;
+      font-size: 12px;
+    }
+
+    .investment-table th {
+      color: #795C69;
+      background: #FFF9FB;
+      text-transform: uppercase;
+      font-size: 10px;
+    }
+
+    .investment-table td:first-child {
+      font-weight: 700;
+    }
+
+    .price-up {
+      color: #16834A;
+      font-weight: 700;
+    }
+
+    .price-down {
+      color: #C6284D;
+      font-weight: 700;
+    }
+
+    .investment-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 20px;
+    }
+
+    .investment-options {
+      display: grid;
+      gap: 12px;
+      margin-top: 18px;
+    }
+
+    .investment-option {
+      border: 1px solid #F0DDE4;
+      border-radius: 12px;
+      padding: 16px;
+    }
+
+    .investment-option h3 {
+      font-size: 14px;
+      margin-bottom: 6px;
+    }
+
+    .investment-option p {
+      color: #795C69;
+      font-size: 12px;
+      line-height: 1.7;
+    }
+
+    .investment-notice {
+      margin-top: 16px;
+      padding: 14px;
+      border-left: 4px solid #D91F5D;
+      background: #FFF5F7;
+      border-radius: 8px;
+      color: #795C69;
+      font-size: 12px;
+      line-height: 1.8;
+    }
+
+
+    .portfolio-stats { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; margin:18px 0; }
+    .portfolio-stat { background:#FFF5F7; border:1px solid #F0DDE4; border-radius:12px; padding:15px; min-width:0; }
+    .portfolio-stat span { display:block; color:#795C69; font-size:11px; margin-bottom:7px; }
+    .portfolio-stat strong { color:#A51246; font-size:clamp(16px,2vw,23px); overflow-wrap:anywhere; }
+    .portfolio-form-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:0 14px; }
+    .portfolio-table { min-width:720px; }
+    .delete-investment { border:1px solid #F0DDE4; background:#FFF5F7; color:#A51246; border-radius:7px; padding:7px 10px; cursor:pointer; font-weight:700; }
+    .projection-chart { display:grid; gap:12px; margin-top:18px; }
+    .projection-row { display:grid; grid-template-columns:55px minmax(0,1fr) 105px; align-items:center; gap:10px; font-size:11px; }
+    .projection-track { height:15px; background:#FCE8EF; border-radius:99px; overflow:hidden; }
+    .projection-bar { height:100%; background:#D91F5D; border-radius:99px; min-width:2px; }
+    .projection-legend { color:#795C69; font-size:11px; margin-top:12px; }
+    @media(max-width:700px) { .portfolio-form-grid,.portfolio-stats { grid-template-columns:1fr; } .projection-row { grid-template-columns:42px minmax(0,1fr) 85px; } }
+
+    .fund-history {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 10px;
+      margin-top: 15px;
+    }
+
+    .fund-history-item {
+      border: 1px solid #F0DDE4;
+      border-radius: 10px;
+      padding: 13px;
+      overflow-wrap: anywhere;
+    }
+
+    .fund-history-item strong {
+      display: block;
+      color: #A51246;
+      margin-top: 5px;
+    }
+
+    /* MARKET INDEX CARDS */
+    .index-heading,
+    .market-heading {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .index-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 15px;
+      margin-top: 20px;
+    }
+
+    .index-card {
+      border: 1px solid #F0DDE4;
+      background: linear-gradient(145deg, #FFFFFF, #FFF5F8);
+      border-radius: 14px;
+      padding: 20px;
+      min-width: 0;
+    }
+
+    .index-card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .index-icon {
+      display: inline-flex;
+      width: 38px;
+      height: 38px;
+      border-radius: 11px;
+      align-items: center;
+      justify-content: center;
+      background: #FCE8EF;
+      color: #A51246;
+      font-size: 19px;
+    }
+
+    .index-label {
+      color: #795C69;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .index-value {
+      display: block;
+      color: #421629;
+      font-size: clamp(22px, 3vw, 29px);
+      font-weight: 800;
+      letter-spacing: -0.7px;
+      margin-top: 17px;
+      overflow-wrap: anywhere;
+    }
+
+    .index-date {
+      color: #795C69;
+      font-size: 11px;
+      line-height: 1.6;
+      margin-top: 9px;
+    }
+
+    .index-stat {
+      display: inline-block;
+      margin-top: 10px;
+      padding: 5px 9px;
+      border-radius: 7px;
+      font-size: 11px;
+      font-weight: 700;
+      background: #FCE8EF;
+      color: #A51246;
+    }
+
+    .index-stat.positive {
+      color: #16834A;
+      background: #E8F7EE;
+    }
+
+    .index-stat.negative {
+      color: #B42332;
+      background: #FFF0F0;
+    }
+
+    .index-empty {
+      border: 1px dashed #E6C6D2;
+      background: #FFF9FB;
+      border-radius: 12px;
+      padding: 18px;
+      color: #795C69;
+      font-size: 13px;
+      line-height: 1.7;
+      margin-top: 15px;
+    }
+
+    @media (max-width: 700px) {
+      .investment-page {
+        padding: 18px 13px 35px;
+      }
+
+      .investment-panel {
+        padding: 17px;
+      }
+
+      .investment-grid,
+      .index-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .investment-header {
+        flex-wrap: wrap;
+      }
+    }
+  </style>
+</head>
+
+<body>
+<main class="investment-page">
+
+  <header class="investment-header">
+    <a class="back-link" href="dashboard.html">← Back to dashboard</a>
+    <a class="back-link" href="index.html">FinPath</a>
+  </header>
+
+  <section>
+    <span class="tag">FINPATH INVESTMENT PLANNER</span>
+    <h1>Explore your investment options</h1>
+    <p class="muted">
+      Explore stock quotes, market indices, mutual fund NAVs, and
+      investment projections. Compare information and consider how
+      each option fits your financial goals.
+    </p>
+  </section>
+
+  <!-- STOCK MARKET -->
+  <section class="investment-panel">
+    <div class="market-heading">
+      <h2>Indian stock market</h2>
+      <button class="investment-button" id="refreshStocks" type="button">
+        ↻ Refresh quotes
+      </button>
+    </div>
+
+    <p class="muted">
+      Quotes supplied by the connected Tapetide market-data API.
+    </p>
+
+    <p class="investment-status" id="stockStatus" aria-live="polite">
+      Loading stock quotes...
+    </p>
+
+    <div class="investment-table-wrap">
+      <table class="investment-table">
+        <thead>
+          <tr>
+            <th>Company</th>
+            <th>Symbol</th>
+            <th>Price</th>
+            <th>Change</th>
+            <th>Updated</th>
+          </tr>
+        </thead>
+        <tbody id="stockTableBody">
+          <tr><td colspan="5">Loading quotes...</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p class="investment-notice">
+      The timestamp indicates when the provider updated the quote.
+      Refreshing does not guarantee a new price, especially outside
+      market hours. Check the timestamp before relying on a quote.
+    </p>
+  </section>
+
+  <!-- MARKET INDICES -->
+  <section class="investment-panel">
+    <div class="index-heading">
+      <div>
+        <h2>Market indices</h2>
+        <p class="muted">
+          Track the latest available daily index levels.
+        </p>
+      </div>
+      <button class="investment-button" id="refreshIndices" type="button">
+        ↻ Refresh indices
+      </button>
+    </div>
+
+    <p class="investment-status" id="indexStatus" aria-live="polite">
+      Loading market indices...
+    </p>
+
+    <div class="index-grid" id="indexGrid">
+      <article class="index-card">
+        <span class="index-label">NIFTY 50</span>
+        <span class="index-value">Loading...</span>
+      </article>
+      <article class="index-card">
+        <span class="index-label">NIFTY BANK</span>
+        <span class="index-value">Loading...</span>
+      </article>
+      <article class="index-card">
+        <span class="index-label">NIFTY IT</span>
+        <span class="index-value">Loading...</span>
+      </article>
+    </div>
+
+    <p class="investment-notice">
+      Index levels are daily market data, not guaranteed real-time
+      prices. The date shown on each card is the date of the index
+      observation returned by the data provider.
+    </p>
+  </section>
+
+  <!-- MUTUAL FUND LOOKUP -->
+  <section class="investment-panel">
+    <h2>Mutual fund NAV lookup</h2>
+    <p class="muted">
+      Enter a numeric scheme code to look up its available NAV history.
+    </p>
+
+    <form id="fundForm">
+      <div class="investment-field">
+        <label for="schemeCode">Mutual fund scheme code</label>
+        <input id="schemeCode" type="text"
+          inputmode="numeric" pattern="[0-9]+"
+          placeholder="Enter numeric scheme code" required>
+      </div>
+
+      <button class="investment-button" id="fundButton"
+        type="submit" style="margin-top:14px">
+        Find NAV
+      </button>
+    </form>
+
+    <p class="investment-status" id="fundStatus" aria-live="polite"></p>
+    <div id="fundResult"></div>
+
+    <p class="investment-notice">
+      NAVs are generally published periodically rather than
+      continuously in real time. Verify the scheme and NAV date
+      before making an investment decision.
+    </p>
+  </section>
+
+
+  <!-- PERSONAL INVESTMENT PORTFOLIO -->
+  <section class="investment-panel" id="myPortfolio">
+    <h2>My investment records</h2>
+    <p class="muted">Record investments you already own. Your records stay in this browser using local storage; they are not fetched from a bank or broker.</p>
+    <div class="portfolio-stats">
+      <div class="portfolio-stat"><span>TOTAL INVESTED</span><strong id="portfolioInvested">₹0.00</strong></div>
+      <div class="portfolio-stat"><span>CURRENT VALUE</span><strong id="portfolioCurrent">₹0.00</strong></div>
+      <div class="portfolio-stat"><span>GAIN / LOSS (EST.)</span><strong id="portfolioGain">₹0.00</strong></div>
+    </div>
+    <form id="portfolioForm">
+      <div class="portfolio-form-grid">
+        <div class="investment-field"><label for="holdingName">Investment name</label><input id="holdingName" maxlength="80" placeholder="e.g. Nifty 50 Index Fund" required></div>
+        <div class="investment-field"><label for="holdingType">Investment type</label><select id="holdingType"><option>Stocks</option><option>Mutual fund</option><option>ETF</option><option>Fixed deposit</option><option>Gold</option><option>Bonds</option><option>Other</option></select></div>
+        <div class="investment-field"><label for="holdingDate">Purchase date</label><input id="holdingDate" type="date" required></div>
+        <div class="investment-field"><label for="holdingInvested">Amount invested (₹)</label><input id="holdingInvested" type="number" min="0.01" step="0.01" placeholder="5000" required></div>
+        <div class="investment-field"><label for="holdingCurrent">Current value (₹)</label><input id="holdingCurrent" type="number" min="0" step="0.01" placeholder="5400" required></div>
+        <div class="investment-field"><label for="holdingMonthly">Monthly contribution (₹)</label><input id="holdingMonthly" type="number" min="0" step="0.01" value="0" required></div>
+      </div>
+      <button class="investment-button" type="submit" style="margin-top:18px">＋ Add investment record</button>
+      <button class="investment-button" type="button" id="clearPortfolio" style="margin-top:18px;background:#795C69">Clear all records</button>
+    </form>
+    <p class="investment-status" id="portfolioStatus" aria-live="polite">No records added yet.</p>
+    <div class="investment-table-wrap">
+      <table class="investment-table portfolio-table"><thead><tr><th>Investment</th><th>Type</th><th>Purchase date</th><th>Invested</th><th>Current value</th><th>Gain/loss</th><th>Monthly contribution</th><th>Action</th></tr></thead><tbody id="portfolioBody"><tr><td colspan="8">No investment records yet. Add your first record above.</td></tr></tbody></table>
+    </div>
+    <div class="investment-notice">Enter current values yourself and update them when needed. FinPath does not automatically know your holdings or broker account balance. Gains/losses shown here are estimates based on the values you enter.</div>
+  </section>
+
+  <!-- CALCULATOR AND RISK PLANNER -->
+  <div class="investment-grid" style="margin-top:22px">
+
+    <section class="investment-panel">
+      <h2>Investment calculator</h2>
+      <p class="muted">
+        Estimate a possible future value using your assumptions.
+      </p>
+
+      <form id="investmentForm">
+        <div class="investment-field">
+          <label for="initial">Initial investment (₹)</label>
+          <input id="initial" type="number" min="0"
+            max="100000000000" step="1000" value="10000" required>
+        </div>
+
+        <div class="investment-field">
+          <label for="monthly">Monthly investment (₹)</label>
+          <input id="monthly" type="number" min="0"
+            max="1000000000" step="500" value="5000" required>
+        </div>
+
+        <div class="investment-field">
+          <label for="years">Investment duration</label>
+          <select id="years">
+            <option value="1">1 year</option>
+            <option value="3">3 years</option>
+            <option value="5" selected>5 years</option>
+            <option value="10">10 years</option>
+            <option value="15">15 years</option>
+            <option value="20">20 years</option>
+          </select>
+        </div>
+
+        <div class="investment-field">
+          <label for="rate">Assumed annual return (%)</label>
+          <input id="rate" type="number" min="0" max="30"
+            step="0.5" value="8" required>
+        </div>
+
+        <button class="investment-button" type="submit"
+          style="width:100%;margin-top:18px">
+          Calculate projection
+        </button>
+      </form>
+
+      <div class="investment-result" aria-live="polite">
+        <span class="muted">Illustrative future value</span>
+        <strong id="futureValue">₹0</strong>
+        <small class="muted" id="resultDetails"></small>
+      </div>
+
+      <div><h3 style="margin-top:20px;font-size:14px">Projected growth over time</h3><div id="projectionChart" class="projection-chart" aria-label="Illustrative investment projection graph"></div><p class="projection-legend">Bars show estimated future value for each year, based on the return assumption you entered.</p></div>
+      <p class="muted" id="projectionNote" style="margin-top:12px">
+        This is a mathematical estimate, not a guaranteed return.
+      </p>
+    </section>
+
+    <section class="investment-panel">
+      <h2>Understand your risk comfort</h2>
+      <p class="muted">
+        Think about when you need the money and how much uncertainty
+        you can tolerate.
+      </p>
+
+      <div class="investment-field">
+        <label for="risk">Risk comfort</label>
+        <select id="risk">
+          <option value="low">Low — prefer stability</option>
+          <option value="medium" selected>
+            Medium — accept some fluctuation
+          </option>
+          <option value="high">High — accept larger fluctuations</option>
+        </select>
+      </div>
+
+      <div class="investment-field">
+        <label for="horizon">When will you need this money?</label>
+        <select id="horizon">
+          <option value="short">Within 3 years</option>
+          <option value="medium" selected>In 3–7 years</option>
+          <option value="long">After 7 years</option>
+        </select>
+      </div>
+
+      <div class="investment-result">
+        <span class="muted">Planning consideration</span>
+        <strong id="riskTitle" style="font-size:20px">
+          Balance growth and stability
+        </strong>
+        <p class="muted" id="riskAdvice"></p>
+      </div>
+
+      <div class="investment-notice">
+        Consider essential expenses, an emergency reserve, liquidity,
+        and possible losses before committing money to investments.
+      </div>
+    </section>
+  </div>
+
+  <!-- EDUCATIONAL CATEGORIES -->
+  <section class="investment-panel">
+    <h2>Compare investment categories</h2>
+
+    <div class="investment-options">
+      <article class="investment-option">
+        <span class="tag">LOWER MARKET EXPOSURE</span>
+        <h3>Fixed deposits</h3>
+        <p>
+          Offer a stated interest rate for a chosen term. Check the
+          interest rate, premature-withdrawal conditions, taxation,
+          and applicable deposit protection.
+        </p>
+      </article>
+
+      <article class="investment-option">
+        <span class="tag">MARKET-LINKED</span>
+        <h3>Mutual funds</h3>
+        <p>
+          Pool investors' money into assets such as bonds or shares.
+          Risk, fees, and potential returns vary by fund. Returns
+          are not guaranteed.
+        </p>
+      </article>
+
+      <article class="investment-option">
+        <span class="tag">LONG-TERM PLANNING</span>
+        <h3>Diversified equity investments</h3>
+        <p>
+          May suit some long-term plans, but market values can fall
+          substantially. Consider diversification, your time horizon,
+          and your ability to tolerate losses.
+        </p>
+      </article>
+    </div>
+
+    <div class="investment-notice">
+      FinPath is an educational decision-support tool, not a
+      personalized investment recommendation service.
+    </div>
+  </section>
+
+</main>
+
+<script>
+"use strict";
+
+/* SHARED HELPERS */
+const money = value =>
+  "₹" + Number(value).toLocaleString("en-IN", {
+    maximumFractionDigits: 2,
+    minimumFractionDigits: 2
+  });
+
+const numberFormat = value =>
+  Number(value).toLocaleString("en-IN", {
+    maximumFractionDigits: 2,
+    minimumFractionDigits: 2
+  });
+
+function setStatus(element, message, isError = false) {
+  element.textContent = message;
+  element.classList.toggle("error", isError);
+}
+
+function formatDate(value) {
+  if (!value) return "Not supplied";
+
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return String(value);
+
+  return date.toLocaleString("en-IN", {
+    dateStyle: "medium",
+    timeStyle: "short",
+    timeZone: "Asia/Kolkata"
+  }) + " IST";
+}
+
+function formatDateOnly(value) {
+  if (!value) return "Date not supplied";
+
+  const date = new Date(value + "T00:00:00");
+
+  if (Number.isNaN(date.getTime())) return String(value);
+
+  return date.toLocaleDateString("en-IN", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+    timeZone: "Asia/Kolkata"
+  });
+}
+
+/*
+  API CONNECTION SETTINGS
+
+  Local setup:
+  - If Express serves the website at localhost:3000, API_BASE stays empty.
+  - If you open the HTML using VS Code Live Server (usually localhost:5500),
+    requests are sent to the Express backend at localhost:3000.
+
+  When you deploy the backend separately, replace the deployed-backend
+  example in the DEPLOYMENT NOTE below with your real backend URL.
+*/
+const API_BASE = (
+  window.location.protocol === "file:" ||
+  (["localhost", "127.0.0.1"].includes(window.location.hostname) &&
+   window.location.port !== "3000")
+) ? "http://localhost:3000" : "";
+
+/*
+  DEPLOYMENT NOTE:
+  Once the backend is deployed separately, set API_BASE to its public origin,
+  for example: "https://your-real-backend-domain.example"
+  Do not include /api/stocks or a trailing slash in API_BASE.
+*/
+
+async function getJSON(url) {
+  const requestUrl = API_BASE + url;
+  const response = await fetch(requestUrl, {
+    headers: { "Accept": "application/json" }
+  });
+
+  const responseText = await response.text();
+  let result;
+
+  try {
+    result = JSON.parse(responseText);
+  } catch {
+    const preview = responseText.slice(0, 100).replace(/\\s+/g, " ");
+    throw new Error(
+      "The API returned a webpage instead of JSON. Requested: " +
+      requestUrl +
+      ". Check that the backend is running and the API URL is correct. Response: " +
+      preview
+    );
+  }
+
+  if (!response.ok) {
+    throw new Error(
+      result?.message ||
+      result?.error?.message ||
+      "Request failed: " + response.status
+    );
+  }
+
+  return result;
+}
+
+/* STOCK QUOTES */
+const stockBody = document.getElementById("stockTableBody");
+const stockStatus = document.getElementById("stockStatus");
+const refreshStocks = document.getElementById("refreshStocks");
+
+async function loadStocks() {
+  refreshStocks.disabled = true;
+  refreshStocks.textContent = "Loading...";
+  setStatus(stockStatus, "Requesting stock quotes...");
+
+  try {
+    const result = await getJSON("/api/stocks");
+    const stocks = result.data;
+
+    if (!Array.isArray(stocks) || stocks.length === 0) {
+      throw new Error("No stock quotes were returned.");
+    }
+
+    stockBody.replaceChildren();
+
+    stocks.forEach(stock => {
+      const row = document.createElement("tr");
+
+      const values = [
+        stock.name || stock.symbol || "Unknown",
+        stock.symbol || "—",
+        stock.price ?? stock.ltp,
+        stock.change_pct,
+        stock.updated_at
+      ];
+
+      values.forEach((value, index) => {
+        const cell = document.createElement("td");
+
+        if (index === 2) {
+          cell.textContent = value == null ? "—" : money(value);
+        } else if (index === 3) {
+          if (value == null || !Number.isFinite(Number(value))) {
+            cell.textContent = "—";
+          } else {
+            const change = Number(value);
+
+            cell.textContent =
+              (change > 0 ? "+" : "") + change.toFixed(2) + "%";
+
+            cell.className =
+              change > 0 ? "price-up" :
+              change < 0 ? "price-down" : "";
+          }
+        } else if (index === 4) {
+          cell.textContent = formatDate(value);
+        } else {
+          cell.textContent = value == null ? "—" : String(value);
+        }
+
+        row.appendChild(cell);
+      });
+
+      stockBody.appendChild(row);
+    });
+
+    const timestamps = stocks
+      .map(stock => stock.updated_at)
+      .filter(Boolean)
+      .map(value => new Date(value).getTime())
+      .filter(Number.isFinite);
+
+    const oldest = timestamps.length ? Math.min(...timestamps) : null;
+
+    const stale = oldest !== null &&
+      Date.now() - oldest > 24 * 60 * 60 * 1000;
+
+    setStatus(
+      stockStatus,
+      "Received " + stocks.length + " stock quotes." +
+      (stale
+        ? " Warning: the oldest quote is more than 24 hours old."
+        : " Check each quote timestamp for freshness."),
+      stale
+    );
+  } catch (error) {
+    setStatus(stockStatus, error.message, true);
+
+    const row = document.createElement("tr");
+    const cell = document.createElement("td");
+    cell.colSpan = 5;
+    cell.textContent = "Could not load stock quotes. Try again.";
+    row.appendChild(cell);
+    stockBody.replaceChildren(row);
+  } finally {
+    refreshStocks.disabled = false;
+    refreshStocks.textContent = "↻ Refresh quotes";
+  }
+}
+
+refreshStocks.addEventListener("click", loadStocks);
+
+/* MARKET INDICES */
+const indexGrid = document.getElementById("indexGrid");
+const indexStatus = document.getElementById("indexStatus");
+const refreshIndices = document.getElementById("refreshIndices");
+
+const indexIcons = {
+  "Nifty 50": "📈",
+  "Nifty Bank": "🏦",
+  "Nifty IT": "💻"
+};
+
+function createIndexCard(index) {
+  const card = document.createElement("article");
+  card.className = "index-card";
+
+  const top = document.createElement("div");
+  top.className = "index-card-top";
+
+  const label = document.createElement("span");
+  label.className = "index-label";
+  label.textContent = index.name.toUpperCase();
+
+  const icon = document.createElement("span");
+  icon.className = "index-icon";
+  icon.textContent = indexIcons[index.name] || "📊";
+  icon.setAttribute("aria-hidden", "true");
+
+  top.append(label, icon);
+
+  const latest = index.latest || {};
+  const close = Number(latest.close);
+
+  const value = document.createElement("strong");
+  value.className = "index-value";
+  value.textContent = Number.isFinite(close)
+    ? numberFormat(close)
+    : "Unavailable";
+
+  const date = document.createElement("p");
+  date.className = "index-date";
+  date.textContent = "Data date: " +
+    (latest.date ? formatDateOnly(latest.date) : "Not supplied");
+
+  card.append(top, value, date);
+
+  if (Number.isFinite(Number(latest.open)) &&
+      Number.isFinite(close)) {
+    const difference = close - Number(latest.open);
+    const stat = document.createElement("span");
+
+    stat.className = "index-stat";
+
+    if (difference > 0) {
+      stat.classList.add("positive");
+      stat.textContent = "+" + numberFormat(difference) + " vs open";
+    } else if (difference < 0) {
+      stat.classList.add("negative");
+      stat.textContent = numberFormat(difference) + " vs open";
+    } else {
+      stat.textContent = "Unchanged vs open";
+    }
+
+    card.appendChild(stat);
+  }
+
+  if (Number.isFinite(Number(latest.high)) &&
+      Number.isFinite(Number(latest.low))) {
+    const range = document.createElement("p");
+    range.className = "index-date";
+    range.textContent =
+      "Day range: " + numberFormat(latest.low) +
+      " – " + numberFormat(latest.high);
+
+    card.appendChild(range);
+  }
+
+  return card;
+}
+
+async function loadIndices() {
+  refreshIndices.disabled = true;
+  refreshIndices.textContent = "Loading...";
+  setStatus(indexStatus, "Fetching market index data...");
+
+  try {
+    const result = await getJSON("/api/indices");
+    const indices = result.data;
+
+    if (!Array.isArray(indices) || indices.length === 0) {
+      throw new Error("No market indices were returned.");
+    }
+
+    indexGrid.replaceChildren();
+
+    indices.forEach(index => {
+      indexGrid.appendChild(createIndexCard(index));
+    });
+
+    const dataDates = indices
+      .map(index => index.latest?.date)
+      .filter(Boolean);
+
+    const uniqueDates = [...new Set(dataDates)];
+
+    if (uniqueDates.length === 1) {
+      setStatus(
+        indexStatus,
+        "Successfully loaded " + indices.length +
+        " indices. Latest available data date: " +
+        formatDateOnly(uniqueDates[0]) + "."
+      );
+    } else {
+      setStatus(
+        indexStatus,
+        "Successfully loaded " + indices.length +
+        " indices. Check each card for its data date."
+      );
+    }
+  } catch (error) {
+    setStatus(
+      indexStatus,
+      "Could not load market indices: " + error.message,
+      true
+    );
+
+    indexGrid.replaceChildren();
+
+    const empty = document.createElement("div");
+    empty.className = "index-empty";
+    empty.style.gridColumn = "1 / -1";
+    empty.textContent =
+      "Index data is temporarily unavailable. Please try refreshing.";
+
+    indexGrid.appendChild(empty);
+  } finally {
+    refreshIndices.disabled = false;
+    refreshIndices.textContent = "↻ Refresh indices";
+  }
+}
+
+refreshIndices.addEventListener("click", loadIndices);
+
+/* MUTUAL FUND NAV LOOKUP */
+const fundForm = document.getElementById("fundForm");
+const fundStatus = document.getElementById("fundStatus");
+const fundResult = document.getElementById("fundResult");
+const fundButton = document.getElementById("fundButton");
+
+fundForm.addEventListener("submit", async event => {
+  event.preventDefault();
+
+  const code = document.getElementById("schemeCode").value.trim();
+
+  if (!/^\d+$/.test(code)) {
+    setStatus(fundStatus, "Enter a numeric scheme code.", true);
+    return;
+  }
+
+  fundButton.disabled = true;
+  fundButton.textContent = "Searching...";
+  fundResult.replaceChildren();
+
+  setStatus(fundStatus, "Searching for NAV information...");
+
+  try {
+    const result = await getJSON(
+      "/api/mutual-funds/" + encodeURIComponent(code)
+    );
+
+    const meta = result.meta || {};
+    const entries = Array.isArray(result.data) ? result.data : [];
+
+    if (!entries.length) {
+      throw new Error("No NAV history was found for this scheme.");
+    }
+
+    const heading = document.createElement("h3");
+    heading.textContent = meta.scheme_name || "Mutual fund " + code;
+
+    const latest = document.createElement("div");
+    latest.className = "investment-result";
+
+    const label = document.createElement("p");
+    label.className = "muted";
+    label.textContent = "Latest available NAV";
+
+    const nav = document.createElement("strong");
+    nav.textContent = entries[0].nav == null
+      ? "Unavailable"
+      : money(entries[0].nav);
+
+    const date = document.createElement("p");
+    date.className = "muted";
+    date.textContent = "NAV date: " +
+      (entries[0].date || "Not supplied");
+
+    latest.append(label, nav, date);
+
+    const historyTitle = document.createElement("h3");
+    historyTitle.textContent = "Recent NAV history";
+    historyTitle.style.marginTop = "20px";
+
+    const history = document.createElement("div");
+    history.className = "fund-history";
+
+    entries.slice(0, 5).forEach(entry => {
+      const item = document.createElement("div");
+      item.className = "fund-history-item";
+
+      const dateLabel = document.createElement("span");
+      dateLabel.className = "muted";
+      dateLabel.textContent = entry.date || "Date unavailable";
+
+      const value = document.createElement("strong");
+      value.textContent = entry.nav == null ? "—" : money(entry.nav);
+
+      item.append(dateLabel, value);
+      history.appendChild(item);
+    });
+
+    fundResult.append(heading, latest, historyTitle, history);
+
+    setStatus(
+      fundStatus,
+      "NAV data received. Confirm the scheme and date before relying on it."
+    );
+  } catch (error) {
+    setStatus(fundStatus, error.message, true);
+  } finally {
+    fundButton.disabled = false;
+    fundButton.textContent = "Find NAV";
+  }
+});
+
+
+/* PERSONAL PORTFOLIO: browser-local records */
+const PORTFOLIO_KEY = "finpathInvestments";
+const portfolioForm = document.getElementById("portfolioForm");
+const portfolioBody = document.getElementById("portfolioBody");
+const portfolioStatus = document.getElementById("portfolioStatus");
+let portfolio = [];
+try {
+  const savedPortfolio = JSON.parse(localStorage.getItem(PORTFOLIO_KEY) || "[]");
+  if (Array.isArray(savedPortfolio)) portfolio = savedPortfolio.filter(item => item && typeof item.name === "string");
+} catch { portfolio = []; }
+const portfolioMoney = value => money(Number(value) || 0);
+function savePortfolio() {
+  try { localStorage.setItem(PORTFOLIO_KEY, JSON.stringify(portfolio)); return true; }
+  catch { setStatus(portfolioStatus, "Could not save records in this browser. Check browser storage settings.", true); return false; }
+}
+function renderPortfolio() {
+  const invested = portfolio.reduce((sum, item) => sum + (Number(item.invested) || 0), 0);
+  const current = portfolio.reduce((sum, item) => sum + (Number(item.current) || 0), 0);
+  const gain = current - invested;
+  document.getElementById("portfolioInvested").textContent = portfolioMoney(invested);
+  document.getElementById("portfolioCurrent").textContent = portfolioMoney(current);
+  const gainElement = document.getElementById("portfolioGain");
+  gainElement.textContent = (gain > 0 ? "+" : gain < 0 ? "−" : "") + portfolioMoney(Math.abs(gain));
+  gainElement.style.color = gain < 0 ? "#B42332" : "#A51246";
+  portfolioBody.replaceChildren();
+  if (!portfolio.length) {
+    const row = document.createElement("tr"); const cell = document.createElement("td");
+    cell.colSpan = 8; cell.textContent = "No investment records yet. Add your first record above."; row.appendChild(cell); portfolioBody.appendChild(row);
+    setStatus(portfolioStatus, "No records added yet."); return;
+  }
+  portfolio.forEach(item => {
+    const row = document.createElement("tr");
+    const values = [item.name, item.type, item.date || "—", portfolioMoney(item.invested), portfolioMoney(item.current), (Number(item.current) >= Number(item.invested) ? "+" : "−") + portfolioMoney(Math.abs(Number(item.current)-Number(item.invested))), portfolioMoney(item.monthly)];
+    values.forEach((value, i) => { const cell = document.createElement("td"); cell.textContent = value; if (i === 5) cell.className = Number(item.current) >= Number(item.invested) ? "price-up" : "price-down"; row.appendChild(cell); });
+    const actionCell = document.createElement("td"); const remove = document.createElement("button"); remove.type = "button"; remove.className = "delete-investment"; remove.textContent = "Delete"; remove.setAttribute("aria-label", "Delete " + item.name);
+    remove.addEventListener("click", () => { portfolio = portfolio.filter(entry => entry.id !== item.id); savePortfolio(); renderPortfolio(); setStatus(portfolioStatus, "Investment record deleted."); });
+    actionCell.appendChild(remove); row.appendChild(actionCell); portfolioBody.appendChild(row);
+  });
+  setStatus(portfolioStatus, portfolio.length + " investment record(s) saved in this browser.");
+}
+portfolioForm.addEventListener("submit", event => {
+  event.preventDefault();
+  const name = document.getElementById("holdingName").value.trim();
+  const type = document.getElementById("holdingType").value;
+  const date = document.getElementById("holdingDate").value;
+  const invested = Number(document.getElementById("holdingInvested").value);
+  const current = Number(document.getElementById("holdingCurrent").value);
+  const monthly = Number(document.getElementById("holdingMonthly").value);
+  if (!name || !date || ![invested,current,monthly].every(Number.isFinite) || invested <= 0 || current < 0 || monthly < 0) {
+    setStatus(portfolioStatus, "Enter a name, purchase date, positive invested amount, and valid non-negative values.", true); return;
+  }
+  portfolio.push({ id: (crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + Math.random()), name, type, date, invested, current, monthly });
+  if (!savePortfolio()) { portfolio.pop(); return; }
+  portfolioForm.reset(); document.getElementById("holdingDate").value = new Date().toISOString().slice(0,10); document.getElementById("holdingMonthly").value = "0";
+  renderPortfolio(); setStatus(portfolioStatus, "Investment record added and saved.");
+});
+document.getElementById("clearPortfolio").addEventListener("click", () => {
+  if (!portfolio.length) { setStatus(portfolioStatus, "There are no records to clear."); return; }
+  if (!confirm("Delete all investment records saved in this browser? This cannot be undone.")) return;
+  portfolio = []; savePortfolio(); renderPortfolio(); setStatus(portfolioStatus, "All investment records cleared.");
+});
+document.getElementById("holdingDate").value = new Date().toISOString().slice(0,10);
+renderPortfolio();
+
+/* INVESTMENT CALCULATOR */
+const investmentForm = document.getElementById("investmentForm");
+
+function calculateProjection(event) {
+  if (event) event.preventDefault();
+
+  const initial = Number(document.getElementById("initial").value);
+  const monthly = Number(document.getElementById("monthly").value);
+  const years = Number(document.getElementById("years").value);
+  const rate = Number(document.getElementById("rate").value);
+
+  if (
+    !Number.isFinite(initial) ||
+    !Number.isFinite(monthly) ||
+    !Number.isFinite(years) ||
+    !Number.isFinite(rate) ||
+    initial < 0 || monthly < 0 ||
+    initial > 100000000000 ||
+    monthly > 1000000000 ||
+    rate < 0 || rate > 30
+  ) {
+    alert("Please enter valid values.");
+    return;
+  }
+
+  const months = years * 12;
+  const monthlyRate = Math.pow(1 + rate / 100, 1 / 12) - 1;
+
+  let futureValue = initial * Math.pow(1 + monthlyRate, months);
+
+  if (monthlyRate === 0) {
+    futureValue += monthly * months;
+  } else {
+    futureValue += monthly *
+      ((Math.pow(1 + monthlyRate, months) - 1) / monthlyRate);
+  }
+
+  const invested = initial + monthly * months;
+
+  document.getElementById("futureValue").textContent =
+    money(futureValue);
+
+  document.getElementById("resultDetails").textContent =
+    "Contributed: " + money(invested) +
+    " · Illustrative growth: " + money(futureValue - invested);
+
+  document.getElementById("projectionNote").textContent =
+    "Assumes a constant annual return of " + rate +
+    "% converted to a monthly rate, with contributions at month-end. " +
+    "Actual returns, taxes, fees and inflation can change the outcome.";
+
+  const chart = document.getElementById("projectionChart");
+  chart.replaceChildren();
+  const points = [];
+  for (let year = 0; year <= years; year++) {
+    const elapsedMonths = year * 12;
+    const value = initial * Math.pow(1 + monthlyRate, elapsedMonths) +
+      (monthlyRate === 0 ? monthly * elapsedMonths : monthly * ((Math.pow(1 + monthlyRate, elapsedMonths) - 1) / monthlyRate));
+    points.push({ year, value });
+  }
+  const maxValue = Math.max(1, ...points.map(point => point.value));
+  points.forEach(point => {
+    const row = document.createElement("div"); row.className = "projection-row";
+    const label = document.createElement("span"); label.textContent = point.year === 0 ? "Start" : "Year " + point.year;
+    const track = document.createElement("div"); track.className = "projection-track";
+    const bar = document.createElement("div"); bar.className = "projection-bar"; bar.style.width = Math.max(point.value > 0 ? 1 : 0, point.value / maxValue * 100) + "%"; track.appendChild(bar);
+    const value = document.createElement("strong"); value.style.textAlign = "right"; value.style.fontSize = "11px"; value.textContent = money(point.value);
+    row.append(label, track, value); chart.appendChild(row);
+  });
+}
+
+investmentForm.addEventListener("submit", calculateProjection);
+
+/* RISK COMFORT PLANNER */
+function updateRiskAdvice() {
+  const risk = document.getElementById("risk").value;
+  const horizon = document.getElementById("horizon").value;
+  const title = document.getElementById("riskTitle");
+  const advice = document.getElementById("riskAdvice");
+
+  if (horizon === "short") {
+    title.textContent = "Prioritize access and stability";
+    advice.textContent =
+      "Money needed within three years may have little time to recover " +
+      "from market declines. Compare accessible options and their terms.";
+  } else if (risk === "low") {
+    title.textContent = "Focus on stability";
+    advice.textContent =
+      "Compare capital stability, liquidity, interest rates and inflation risk.";
+  } else if (risk === "medium") {
+    title.textContent = "Compare risk and growth";
+    advice.textContent =
+      "Compare diversified options, fees and possible losses before deciding.";
+  } else {
+    title.textContent = "Plan for fluctuations";
+    advice.textContent =
+      "A longer horizon does not guarantee a profit. Consider whether " +
+      "you could withstand substantial losses.";
+  }
+}
+
+document.getElementById("risk").addEventListener("change", updateRiskAdvice);
+document.getElementById("horizon").addEventListener("change", updateRiskAdvice);
+
+/* INITIALIZE PAGE */
+calculateProjection();
+updateRiskAdvice();
+loadStocks();
+loadIndices();
+</script>
+</body>
+</html>

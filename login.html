@@ -1,0 +1,353 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign In | FinPath</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .auth-layout {
+      min-height: calc(100vh - 80px);
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      max-width: 1150px;
+      margin: auto;
+      padding: 45px 5%;
+      gap: 60px;
+      align-items: center;
+    }
+
+    .auth-info h1 {
+      font-size: clamp(38px, 5vw, 58px);
+      line-height: 1.1;
+      letter-spacing: -2px;
+      margin: 22px 0;
+    }
+
+    .auth-info p {
+      color: var(--muted);
+      max-width: 420px;
+    }
+
+    .auth-points {
+      margin-top: 28px;
+      display: grid;
+      gap: 15px;
+      color: #d5dfec;
+      font-size: 14px;
+    }
+
+    .auth-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: clamp(22px, 4vw, 38px);
+    }
+
+    .auth-card h2 {
+      font-size: 28px;
+      margin-bottom: 6px;
+    }
+
+    .auth-subtitle {
+      color: var(--muted);
+      font-size: 13px;
+      margin-bottom: 27px;
+    }
+
+    .auth-form {
+      display: grid;
+      gap: 17px;
+    }
+
+    .field {
+      display: grid;
+      gap: 7px;
+    }
+
+    .field label {
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .field input {
+      width: 100%;
+      background: #101827;
+      color: var(--text);
+      border: 1px solid var(--border);
+      padding: 13px 14px;
+      border-radius: 9px;
+      outline: none;
+      font: inherit;
+    }
+
+    .field input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(114,224,176,.1);
+    }
+
+    .auth-submit {
+      width: 100%;
+      margin-top: 4px;
+    }
+
+    .auth-switch {
+      margin-top: 22px;
+      text-align: center;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .text-link {
+      background: none;
+      border: none;
+      color: var(--accent);
+      font-weight: 650;
+      cursor: pointer;
+      padding: 3px;
+    }
+
+    .auth-message {
+      display: none;
+      padding: 12px;
+      border-radius: 9px;
+      font-size: 13px;
+      overflow-wrap: anywhere;
+    }
+
+    .auth-message.error {
+      display: block;
+      background: #49282d;
+      color: #ffb7be;
+    }
+
+    .auth-message.success {
+      display: block;
+      background: #1d4038;
+      color: #a5f4d2;
+    }
+
+    .back-home {
+      display: inline-block;
+      margin-top: 20px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    @media (max-width: 760px) {
+      .auth-layout {
+        grid-template-columns: 1fr;
+        gap: 32px;
+      }
+
+      .auth-info h1 {
+        font-size: 42px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header class="topbar">
+    <a href="index.html" class="brand">
+      <span class="brand-icon">F</span>
+      FinPath<span class="brand-dot">.</span>
+    </a>
+    <a href="index.html" class="btn btn-outline">← Home</a>
+  </header>
+
+  <main class="auth-layout">
+    <section class="auth-info">
+      <span class="eyebrow">YOUR FINANCIAL JOURNEY STARTS HERE</span>
+      <h1>Build a future<br>with <span class="gradient-text">a plan.</span></h1>
+      <p>
+        Bring your goals, priorities, savings and investments together.
+        Understand your choices before you make them.
+      </p>
+
+      <div class="auth-points">
+        <span>✓ Track multiple financial goals</span>
+        <span>✓ Compare alternative financial plans</span>
+        <span>✓ Discover AI-assisted financial insights</span>
+      </div>
+
+      <a href="index.html" class="back-home">← Back to FinPath home</a>
+    </section>
+
+    <section class="auth-card">
+      <h2 id="formTitle">Welcome back</h2>
+      <p class="auth-subtitle" id="formSubtitle">
+        Sign in to continue to your financial dashboard.
+      </p>
+
+      <form id="authForm" class="auth-form">
+        <div class="field" id="nameField" hidden>
+          <label for="fullName">Full name</label>
+          <input id="fullName" type="text" autocomplete="name"
+                 placeholder="Enter your name">
+        </div>
+
+        <div class="field">
+          <label for="email">Email address</label>
+          <input id="email" type="email" autocomplete="email"
+                 placeholder="you@example.com" required>
+        </div>
+
+        <div class="field">
+          <label for="password">Password</label>
+          <input id="password" type="password"
+                 autocomplete="current-password"
+                 minlength="8" placeholder="At least 8 characters"
+                 required>
+        </div>
+
+        <div class="auth-message" id="authMessage" role="status"
+             aria-live="polite"></div>
+
+        <button class="btn btn-primary auth-submit" id="submitBtn"
+                type="submit">Sign In →</button>
+      </form>
+
+      <p class="auth-switch">
+        <span id="switchText">Don't have an account?</span>
+        <button class="text-link" id="switchBtn" type="button">
+          Create account
+        </button>
+      </p>
+
+      <p class="auth-switch">
+        <button class="text-link" id="demoLogin" type="button">
+          Continue with demo account
+        </button>
+      </p>
+    </section>
+  </main>
+
+  <script>
+    const form = document.getElementById("authForm");
+    const nameField = document.getElementById("nameField");
+    const fullName = document.getElementById("fullName");
+    const email = document.getElementById("email");
+    const password = document.getElementById("password");
+    const message = document.getElementById("authMessage");
+
+    let isSignup = false;
+
+    function showMessage(text, type) {
+      message.textContent = text;
+      message.className = "auth-message " + type;
+    }
+
+    function clearMessage() {
+      message.textContent = "";
+      message.className = "auth-message";
+    }
+
+    document.getElementById("switchBtn").addEventListener("click", () => {
+      isSignup = !isSignup;
+      clearMessage();
+
+      nameField.hidden = !isSignup;
+      fullName.required = isSignup;
+      password.autocomplete = isSignup ? "new-password" : "current-password";
+
+      document.getElementById("formTitle").textContent =
+        isSignup ? "Create your account" : "Welcome back";
+
+      document.getElementById("formSubtitle").textContent =
+        isSignup ? "Start building your financial plan." :
+        "Sign in to continue to your financial dashboard.";
+
+      document.getElementById("submitBtn").textContent =
+        isSignup ? "Create Account →" : "Sign In →";
+
+      document.getElementById("switchText").textContent =
+        isSignup ? "Already have an account?" : "Don't have an account?";
+
+      document.getElementById("switchBtn").textContent =
+        isSignup ? "Sign in" : "Create account";
+    });
+
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+      clearMessage();
+
+      const userEmail = email.value.trim().toLowerCase();
+      const userPassword = password.value;
+
+      if (!email.validity.valid || userPassword.length < 8) {
+        showMessage("Enter a valid email and a password of at least 8 characters.", "error");
+        return;
+      }
+
+      // Demo only: browser storage is NOT secure authentication.
+      let users = {};
+
+      try {
+        users = JSON.parse(localStorage.getItem("finpathDemoUsers") || "{}");
+      } catch {
+        showMessage("Could not read demo account data in this browser.", "error");
+        return;
+      }
+
+      if (isSignup) {
+        if (!fullName.value.trim()) {
+          showMessage("Please enter your full name.", "error");
+          return;
+        }
+
+        if (users[userEmail]) {
+          showMessage("An account exists in this demo. Please sign in.", "error");
+          return;
+        }
+
+        // Store no passwords. Real accounts must use Firebase Authentication.
+        users[userEmail] = { name: fullName.value.trim() };
+
+        try {
+          localStorage.setItem("finpathDemoUsers", JSON.stringify(users));
+          localStorage.setItem("finpathDemoUser", JSON.stringify({
+            name: fullName.value.trim(),
+            email: userEmail
+          }));
+          window.location.href = "dashboard.html";
+        } catch {
+          showMessage("Browser storage is unavailable. Try demo access.", "error");
+        }
+      } else {
+        const savedUser = users[userEmail];
+
+        if (!savedUser) {
+          showMessage("No demo profile found. Create an account or use demo access.", "error");
+          return;
+        }
+
+        // This checks a demo profile, NOT the password.
+        // Replace with Firebase sign-in before handling real users.
+        try {
+          localStorage.setItem("finpathDemoUser", JSON.stringify({
+            name: savedUser.name,
+            email: userEmail
+          }));
+          window.location.href = "dashboard.html";
+        } catch {
+          showMessage("Browser storage is unavailable. Try demo access.", "error");
+        }
+      }
+    });
+
+    document.getElementById("demoLogin").addEventListener("click", () => {
+      try {
+        localStorage.setItem("finpathDemoUser", JSON.stringify({
+          name: "Demo User",
+          email: "demo@finpath.local"
+        }));
+        window.location.href = "dashboard.html";
+      } catch {
+        showMessage("Browser storage is unavailable. Please enable it.", "error");
+      }
+    });
+  </script>
+</body>
+</html>
