@@ -57,20 +57,6 @@
     .review { margin-top:22px; background:#FCE8EF; border:1px solid #F0DDE4; padding:20px; border-radius:15px; }
     .review h3 { font-size:16px; margin-bottom:7px; }
     .review p { color:#795C69; font-size:12px; line-height:1.7; }
-    .analysis-grid { display:grid; grid-template-columns:minmax(0,1.2fr) minmax(0,.8fr); gap:18px; margin-top:22px; }
-    .analysis-card { background:#FFF; border:1px solid #F0DDE4; border-radius:15px; padding:21px; min-width:0; }
-    .analysis-card h3 { font-size:16px; margin-bottom:6px; }
-    .analysis-card .muted { margin-bottom:16px; }
-    .goal-chart-row { display:grid; grid-template-columns:minmax(90px,1fr) minmax(90px,2fr) 55px; align-items:center; gap:10px; margin:14px 0; font-size:11px; }
-    .goal-chart-name { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-    .mini-track { height:10px; background:#F9DCE6; border-radius:20px; overflow:hidden; }
-    .mini-fill { height:100%; background:#D91F5D; border-radius:20px; }
-    .history-list { display:grid; gap:10px; }
-    .history-item { display:flex; justify-content:space-between; align-items:flex-start; gap:10px; padding:11px 0; border-bottom:1px solid #F5E5EB; font-size:12px; }
-    .history-item:last-child { border-bottom:0; }
-    .history-item small { display:block; color:#795C69; margin-top:4px; }
-    .history-amount { color:#176B49; font-weight:750; white-space:nowrap; }
-    @media(max-width:800px) { .analysis-grid { grid-template-columns:1fr; } }
     @media(max-width:800px) { .main-grid { grid-template-columns:1fr; } }
     @media(max-width:520px) { .page { padding:20px 13px 40px; } .stats { grid-template-columns:1fr; gap:10px; } .card { padding:16px; } .form-grid { grid-template-columns:1fr; } }
   </style>
@@ -179,27 +165,10 @@
         </div>
       </section>
     </div>
-
-    <section class="analysis-grid">
-      <article class="analysis-card">
-        <h3>Goal progress analysis</h3>
-        <p class="muted">Compare how much you have saved with each target.</p>
-        <div id="goalChart"><p class="muted">Add a goal to see your analysis.</p></div>
-      </article>
-      <article class="analysis-card">
-        <h3>Recent savings activity</h3>
-        <p class="muted">Contributions recorded when you update a goal's total saved amount.</p>
-        <div id="goalHistory" class="history-list"><p class="muted">No contributions recorded yet.</p></div>
-      </article>
-    </section>
   </main>
 
   <script>
     const STORAGE_KEY = "finpathGoals";
-    const HISTORY_KEY = "finpathGoalHistory";
-    let goalHistory = [];
-    try { const h = JSON.parse(localStorage.getItem(HISTORY_KEY) || "[]"); goalHistory = Array.isArray(h) ? h : []; } catch { goalHistory = []; }
-    function saveHistory() { try { localStorage.setItem(HISTORY_KEY, JSON.stringify(goalHistory)); } catch {} }
     const money = n => "₹" + Math.round(n).toLocaleString("en-IN");
 
     const dateInput = document.getElementById("deadline");
@@ -395,8 +364,6 @@
         list.append(card);
       });
 
-      renderGoalAnalysis();
-
       const onTrack = goals.filter(g => getStatus(g).text === "On track").length;
       const review = document.getElementById("reviewText");
 
@@ -413,42 +380,6 @@
           (shortfalls > 0
             ? shortfalls + " goal(s) may need a higher contribution, a later deadline or a revised target."
             : "Review your progress regularly and update your plan when circumstances change.");
-      }
-    }
-
-    function renderGoalAnalysis() {
-      const chart = document.getElementById("goalChart");
-      chart.replaceChildren();
-      if (!goals.length) {
-        const p = document.createElement("p"); p.className = "muted"; p.textContent = "Add a goal to see your analysis."; chart.append(p);
-      } else {
-        goals.forEach(goal => {
-          const row = document.createElement("div"); row.className = "goal-chart-row";
-          const name = document.createElement("div"); name.className = "goal-chart-name"; name.textContent = goal.name;
-          name.title = goal.name;
-          const track = document.createElement("div"); track.className = "mini-track";
-          const fill = document.createElement("div"); fill.className = "mini-fill";
-          fill.style.width = Math.min(100, Math.max(0, goal.saved / goal.target * 100)) + "%";
-          track.append(fill);
-          const pct = document.createElement("strong"); pct.textContent = (Math.min(100, Math.max(0, goal.saved / goal.target * 100))).toFixed(0) + "%";
-          row.append(name, track, pct); chart.append(row);
-        });
-      }
-      const history = document.getElementById("goalHistory");
-      history.replaceChildren();
-      if (!goalHistory.length) {
-        const p = document.createElement("p"); p.className = "muted"; p.textContent = "No contributions recorded yet. Use Update savings to record progress."; history.append(p);
-      } else {
-        goalHistory.slice(0, 8).forEach(item => {
-          const row = document.createElement("div"); row.className = "history-item";
-          const left = document.createElement("div");
-          const name = document.createElement("strong"); name.textContent = item.goalName || "Goal contribution";
-          const date = document.createElement("small");
-          const parsed = new Date(item.date); date.textContent = Number.isNaN(parsed.getTime()) ? "Date unavailable" : parsed.toLocaleDateString("en-IN", { day:"numeric", month:"short", year:"numeric" });
-          left.append(name, date);
-          const amount = document.createElement("span"); amount.className = "history-amount"; amount.textContent = "+" + money(item.amount);
-          row.append(left, amount); history.append(row);
-        });
       }
     }
 
@@ -507,12 +438,6 @@
       if (!saveGoals()) {
         goal.saved = old;
         return;
-      }
-      const delta = goal.saved - old;
-      if (delta > 0) {
-        goalHistory.unshift({ id: Date.now().toString(), goalId: goal.id, goalName: goal.name, amount: delta, date: new Date().toISOString() });
-        goalHistory = goalHistory.slice(0, 100);
-        saveHistory();
       }
 
       render();

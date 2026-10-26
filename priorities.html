@@ -140,6 +140,41 @@ footer { text-align: center; color: var(--muted); font-size: 11px; padding: 25px
   .fields { grid-template-columns: 1fr; }
   h1 { font-size: 25px; }
 }
+
+/* Add Priority modal */
+.modal-backdrop {
+  position: fixed; inset: 0; background: rgba(35, 12, 23, .55);
+  display: none; align-items: center; justify-content: center;
+  padding: 18px; z-index: 9999; overflow-y: auto;
+}
+.modal-backdrop.open { display: flex; }
+.priority-modal {
+  width: min(100%, 650px); background: #fff; border: 1px solid var(--border);
+  border-radius: 18px; padding: 24px; box-shadow: 0 24px 80px rgba(50, 10, 28, .25);
+  max-height: calc(100vh - 36px); overflow-y: auto;
+}
+.modal-header { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; margin-bottom:18px; }
+.modal-header h2 { margin:0 0 6px; font-size:22px; }
+.modal-close { border:0; background:var(--light); color:var(--text); font-size:22px; width:38px; height:38px; padding:0; }
+.modal-fields { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; }
+.modal-fields .full { grid-column:1 / -1; }
+.modal-fields label { font-weight:600; }
+.modal-fields input, .modal-fields select { font-size:14px; padding:12px; }
+.modal-error { display:none; background:#FFF0F2; border:1px solid #F2B8C6; color:#9F1239; border-radius:9px; padding:11px 12px; margin:0 0 14px; font-size:13px; line-height:1.5; }
+.modal-error.show { display:block; }
+.modal-actions { display:flex; justify-content:flex-end; gap:9px; flex-wrap:wrap; margin-top:20px; }
+@media(max-width:520px) {
+  .priority-modal { padding:17px; }
+  .modal-fields { grid-template-columns:1fr; }
+  .modal-fields .full { grid-column:auto; }
+}
+
+
+.message { display:none; border-radius:9px; padding:11px 13px; margin:12px 0; font-size:13px; line-height:1.5; }
+.message.show { display:block; }
+.message.error { background:#FFF0F2; border:1px solid #F2B8C6; color:#9F1239; }
+.message.success { background:#E6F8EF; border:1px solid #B8E8CE; color:#176B49; }
+
 </style>
 </head>
 <body>
@@ -160,6 +195,7 @@ footer { text-align: center; color: var(--muted); font-size: 11px; padding: 25px
     what you actually contribute.
   </p>
 
+  <div id="pageMessage" class="message" role="status" aria-live="polite"></div>
   <div class="top-actions">
     <button class="primary" id="addBtn">＋ Add Priority</button>
     <button id="reviewBtn">✧ Review My Priorities</button>
@@ -241,6 +277,59 @@ footer { text-align: center; color: var(--muted); font-size: 11px; padding: 25px
   </footer>
 </main>
 
+
+<div class="modal-backdrop" id="priorityModal" role="dialog" aria-modal="true" aria-labelledby="priorityModalTitle">
+  <div class="priority-modal">
+    <div class="modal-header">
+      <div>
+        <h2 id="priorityModalTitle">Add a priority</h2>
+        <div class="small">Enter the details below. Fields marked * are required.</div>
+      </div>
+      <button type="button" class="modal-close" id="closePriorityModal" aria-label="Close">×</button>
+    </div>
+    <div class="modal-error" id="priorityFormError" role="alert"></div>
+    <form id="priorityForm" novalidate>
+      <div class="modal-fields">
+        <label class="full">Priority name *
+          <input id="priorityName" type="text" maxlength="100" placeholder="e.g. Medical treatment for parent" required>
+        </label>
+        <label>Category
+          <select id="priorityCategory">
+            <option>Health</option><option>Education</option><option>Housing</option>
+            <option>Debt repayment</option><option>Family</option><option>Lifestyle</option><option>Other</option>
+          </select>
+        </label>
+        <label>Estimated total amount (₹) *
+          <input id="priorityAmount" type="number" min="0" step="1" placeholder="e.g. 50000" required>
+        </label>
+        <label>Deadline
+          <input id="priorityDueDate" type="date">
+        </label>
+        <label>Importance
+          <select id="priorityImportance">
+            <option>Critical</option><option selected>High</option><option>Medium</option><option>Low</option>
+          </select>
+        </label>
+        <label>Urgency
+          <select id="priorityUrgency">
+            <option>Immediate</option><option>High</option><option selected>Medium</option><option>Low</option>
+          </select>
+        </label>
+        <label>Planned monthly contribution (₹) *
+          <input id="priorityPlanned" type="number" min="0" step="1" placeholder="e.g. 5000" required>
+        </label>
+        <label>Actual contribution this month (₹)
+          <input id="priorityActual" type="number" min="0" step="1" value="0">
+        </label>
+      </div>
+      <div class="modal-actions">
+        <button type="button" id="cancelPriorityBtn">Cancel</button>
+        <button type="submit" class="primary">Save Priority</button>
+      </div>
+    </form>
+  </div>
+</div>
+
 <script>
 const STORAGE_KEY = "finpathPriorities";
 const FINANCE_KEY = "finpathDemoFinance";
@@ -261,6 +350,13 @@ function readJSON(key, fallback) {
   } catch {
     return fallback;
   }
+}
+
+function showMessage(text, type) {
+  const el = $("pageMessage");
+  if (!el) return;
+  el.textContent = text;
+  el.className = "message show " + type;
 }
 
 function saveAll() {
@@ -328,7 +424,7 @@ function render() {
       <div class="priority-heading">
         <div>
           <h3>${escapeHTML(p.name)}</h3>
-          <div class="small">Target: ${money(amount)} · Rank #${index + 1}</div>
+          <div class="small">${escapeHTML(p.category || "General")} · Target: ${money(amount)} · Rank #${index + 1}</div>
         </div>
         <span class="badge">${escapeHTML(p.importance || "Medium")}</span>
       </div>
@@ -420,38 +516,77 @@ function escapeHTML(value) {
   })[char]);
 }
 
-function addPriority() {
-  const name = prompt("Enter priority name (e.g. College fees):");
-  if (name === null) return;
-  if (!name.trim()) {
-    alert("Please enter a priority name.");
+function openPriorityModal() {
+  $("priorityForm").reset();
+  $("priorityActual").value = "0";
+  $("priorityImportance").value = "High";
+  $("priorityUrgency").value = "Medium";
+  $("priorityFormError").textContent = "";
+  $("priorityFormError").classList.remove("show");
+  $("priorityModal").classList.add("open");
+  document.body.style.overflow = "hidden";
+  setTimeout(() => $("priorityName").focus(), 0);
+}
+
+function closePriorityModal() {
+  $("priorityModal").classList.remove("open");
+  document.body.style.overflow = "";
+}
+
+function showPriorityFormError(message, fieldId) {
+  const error = $("priorityFormError");
+  error.textContent = message;
+  error.classList.add("show");
+  if (fieldId) $(fieldId).focus();
+}
+
+function addPriorityFromForm(event) {
+  event.preventDefault();
+  const name = $("priorityName").value.trim();
+  const amountText = $("priorityAmount").value.trim();
+  const plannedText = $("priorityPlanned").value.trim();
+  const actualText = $("priorityActual").value.trim();
+  const values = [
+    { value: amountText, id: "priorityAmount", label: "estimated total amount" },
+    { value: plannedText, id: "priorityPlanned", label: "planned monthly contribution" },
+    { value: actualText, id: "priorityActual", label: "actual contribution" }
+  ];
+
+  if (!name) {
+    showPriorityFormError("Please enter a priority name.", "priorityName");
     return;
   }
 
-  const amount = prompt("Enter the total amount needed (₹):", "10000");
-  if (amount === null) return;
-  const planned = prompt("Enter the monthly amount you plan to contribute (₹):", "1000");
-  if (planned === null) return;
-  const dueDate = prompt("Enter target date (YYYY-MM-DD), or leave blank:");
+  for (const item of values) {
+    if (item.value === "" || !Number.isFinite(Number(item.value)) || Number(item.value) < 0) {
+      showPriorityFormError("Please enter a valid amount of ₹0 or more for " + item.label + ".", item.id);
+      return;
+    }
+  }
 
-  if (amount.trim() === "" || !Number.isFinite(Number(amount)) || Number(amount) < 0 ||
-      planned.trim() === "" || !Number.isFinite(Number(planned)) || Number(planned) < 0) {
-    alert("Please enter valid non-negative amounts.");
+  const amount = Number(amountText);
+  const planned = Number(plannedText);
+  const actual = Number(actualText);
+  if (!Number.isSafeInteger(amount) || !Number.isSafeInteger(planned) || !Number.isSafeInteger(actual)) {
+    showPriorityFormError("Please enter whole rupee amounts without decimals.");
     return;
   }
 
   priorities.push({
     id: "priority-" + Date.now(),
-    name: name.trim(),
-    amount: Number(amount),
-    planned: Number(planned),
-    actual: 0,
-    importance: "Medium",
-    urgency: "Medium",
-    dueDate: dueDate || ""
+    name,
+    category: $("priorityCategory").value,
+    amount,
+    planned,
+    actual,
+    importance: $("priorityImportance").value,
+    urgency: $("priorityUrgency").value,
+    dueDate: $("priorityDueDate").value || "",
+    sourceGoal: false
   });
 
   saveAll();
+  closePriorityModal();
   render();
 }
 
@@ -552,7 +687,7 @@ function saveBudget() {
       !Number.isFinite(Number(incomeText)) || !Number.isFinite(Number(expensesText)) ||
       Number(incomeText) < 0 || Number(expensesText) < 0 ||
       (overrideText !== "" && (!Number.isFinite(Number(overrideText)) || Number(overrideText) < 0))) {
-    alert("Enter valid non-negative amounts for income, expenses and budget.");
+    showMessage("Please enter valid non-negative amounts for income, expenses and budget.", "error");
     return;
   }
 
@@ -567,7 +702,7 @@ function saveBudget() {
     localStorage.setItem("finpathPriorityBudget", JSON.stringify(budgetOverride));
   }
   render();
-  alert("Budget saved successfully.");
+  showMessage("Budget saved successfully.", "success");
 }
 
 function resetPriorities() {
@@ -577,7 +712,16 @@ function resetPriorities() {
   render();
 }
 
-$("addBtn").addEventListener("click", addPriority);
+$("addBtn").addEventListener("click", openPriorityModal);
+$("priorityForm").addEventListener("submit", addPriorityFromForm);
+$("closePriorityModal").addEventListener("click", closePriorityModal);
+$("cancelPriorityBtn").addEventListener("click", closePriorityModal);
+$("priorityModal").addEventListener("click", event => {
+  if (event.target === $("priorityModal")) closePriorityModal();
+});
+document.addEventListener("keydown", event => {
+  if (event.key === "Escape" && $("priorityModal").classList.contains("open")) closePriorityModal();
+});
 $("saveBudgetBtn").addEventListener("click", saveBudget);
 $("resetBtn").addEventListener("click", resetPriorities);
 $("reviewBtn").addEventListener("click", () => {
